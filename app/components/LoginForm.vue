@@ -1,7 +1,7 @@
 <template>
   <div class="w-full max-w-md mx-auto">
     <!-- Container do formulário -->
-    <div class="bg-background-primary rounded-xl shadow-medium border border-border-light p-8">
+    <div class="bg-white/95 backdrop-blur-sm rounded-xl shadow-2xl border border-gray-200 p-8">
       <!-- Header do formulário -->
       <div class="text-center mb-8">
         <h2 class="text-2xl font-bold text-text-primary mb-2">
@@ -47,6 +47,11 @@
         >
           <div v-if="activeTab === 'login'" key="login" class="space-y-6">
             <form @submit.prevent="handleLogin" class="space-y-4">
+              <!-- Erro de login -->
+              <div v-if="errors.login" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                {{ errors.login }}
+              </div>
+
               <!-- Email -->
               <BaseInput
                 v-model="loginForm.email"
@@ -55,6 +60,7 @@
                 placeholder="seu@email.com"
                 required
                 :icon-left="EnvelopeIcon"
+                :error-message="loginForm.email && !isValidEmail(loginForm.email) ? 'Email inválido' : ''"
               />
 
               <!-- Senha -->
@@ -62,9 +68,10 @@
                 v-model="loginForm.password"
                 type="password"
                 label="Senha"
-                placeholder="Sua senha"
+                placeholder="Sua senha (mínimo 6 caracteres)"
                 required
                 :icon-left="LockClosedIcon"
+                :error-message="loginForm.password && !isValidPassword(loginForm.password) ? 'Senha deve ter pelo menos 6 caracteres' : ''"
               />
 
               <!-- Botão de login -->
@@ -74,6 +81,8 @@
                 size="lg"
                 full-width
                 class="mt-6"
+                :loading="loading"
+                :disabled="loading"
               >
                 Entrar
               </BaseButton>
@@ -93,6 +102,11 @@
           <!-- Aba Criar Conta -->
           <div v-else key="register" class="space-y-6">
             <form @submit.prevent="handleRegister" class="space-y-4">
+              <!-- Erro de registro -->
+              <div v-if="errors.register" class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">
+                {{ errors.register }}
+              </div>
+
               <!-- Email -->
               <BaseInput
                 v-model="registerForm.email"
@@ -101,6 +115,7 @@
                 placeholder="seu@email.com"
                 required
                 :icon-left="EnvelopeIcon"
+                :error-message="registerForm.email && !isValidEmail(registerForm.email) ? 'Email inválido' : ''"
               />
 
               <!-- Senha -->
@@ -108,9 +123,10 @@
                 v-model="registerForm.password"
                 type="password"
                 label="Senha"
-                placeholder="Crie uma senha"
+                placeholder="Crie uma senha (mínimo 6 caracteres)"
                 required
                 :icon-left="LockClosedIcon"
+                :error-message="registerForm.password && !isValidPassword(registerForm.password) ? 'Senha deve ter pelo menos 6 caracteres' : ''"
               />
 
               <!-- Confirmar Senha -->
@@ -131,6 +147,8 @@
                 size="lg"
                 full-width
                 class="mt-6"
+                :loading="loading"
+                :disabled="loading"
               >
                 Criar Conta
               </BaseButton>
@@ -158,6 +176,10 @@ import { EnvelopeIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 import BaseInput from '~/components/BaseInput.vue'
 import BaseButton from '~/components/BaseButton.vue'
 
+// Composables
+const { signIn, signUp, loading } = useAuth()
+const { success, error } = useToastNotification()
+
 // Estado das abas
 const activeTab = ref('login')
 
@@ -174,6 +196,23 @@ const registerForm = ref({
   confirmPassword: ''
 })
 
+// Estado de erros
+const errors = ref({
+  login: '',
+  register: ''
+})
+
+// Função para validar email
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  return emailRegex.test(email)
+}
+
+// Função para validar senha
+const isValidPassword = (password) => {
+  return password.length >= 6
+}
+
 // Validação de confirmação de senha
 const passwordMismatchError = computed(() => {
   if (registerForm.value.confirmPassword && 
@@ -183,28 +222,146 @@ const passwordMismatchError = computed(() => {
   return ''
 })
 
+// Validação do formulário de login
+const validateLoginForm = () => {
+  errors.value.login = ''
+  
+  if (!loginForm.value.email.trim()) {
+    errors.value.login = 'Email é obrigatório'
+    return false
+  }
+  
+  if (!isValidEmail(loginForm.value.email)) {
+    errors.value.login = 'Email inválido'
+    return false
+  }
+  
+  if (!loginForm.value.password.trim()) {
+    errors.value.login = 'Senha é obrigatória'
+    return false
+  }
+  
+  if (!isValidPassword(loginForm.value.password)) {
+    errors.value.login = 'Senha deve ter pelo menos 6 caracteres'
+    return false
+  }
+  
+  return true
+}
+
+// Validação do formulário de registro
+const validateRegisterForm = () => {
+  errors.value.register = ''
+  
+  if (!registerForm.value.email.trim()) {
+    errors.value.register = 'Email é obrigatório'
+    return false
+  }
+  
+  if (!isValidEmail(registerForm.value.email)) {
+    errors.value.register = 'Email inválido'
+    return false
+  }
+  
+  if (!registerForm.value.password.trim()) {
+    errors.value.register = 'Senha é obrigatória'
+    return false
+  }
+  
+  if (!isValidPassword(registerForm.value.password)) {
+    errors.value.register = 'Senha deve ter pelo menos 6 caracteres'
+    return false
+  }
+  
+  if (!registerForm.value.confirmPassword.trim()) {
+    errors.value.register = 'Confirmação de senha é obrigatória'
+    return false
+  }
+  
+  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+    errors.value.register = 'As senhas não coincidem'
+    return false
+  }
+  
+  return true
+}
+
 // Função para mudar de aba
 const setActiveTab = (tab) => {
   activeTab.value = tab
   // Limpar formulários ao trocar de aba
   loginForm.value = { email: '', password: '' }
   registerForm.value = { email: '', password: '', confirmPassword: '' }
+  errors.value = { login: '', register: '' }
 }
 
-// Handlers dos formulários (apenas preventDefault por enquanto)
-const handleLogin = (event) => {
-  // TODO: Implementar lógica de login
-  console.log('Login form submitted:', loginForm.value)
-}
-
-const handleRegister = (event) => {
-  // Verificar se as senhas coincidem antes de prosseguir
-  if (registerForm.value.password !== registerForm.value.confirmPassword) {
+// Handler do login
+const handleLogin = async (event) => {
+  // Validar formulário antes de enviar
+  if (!validateLoginForm()) {
     return
   }
   
-  // TODO: Implementar lógica de registro
-  console.log('Register form submitted:', registerForm.value)
+  try {
+    const { user, error } = await signIn(loginForm.value.email, loginForm.value.password)
+    
+    if (error) {
+      // Tratar diferentes tipos de erro
+      if (error.message?.includes('Invalid login credentials')) {
+        errors.value.login = 'Email ou senha incorretos'
+      } else if (error.message?.includes('Email not confirmed')) {
+        errors.value.login = 'Verifique seu email para confirmar a conta'
+      } else if (error.message?.includes('Too many requests')) {
+        errors.value.login = 'Muitas tentativas. Tente novamente em alguns minutos'
+      } else {
+        errors.value.login = error.message || 'Erro ao fazer login'
+      }
+      return
+    }
+    
+    if (user) {
+      success('Login realizado com sucesso!')
+      await navigateTo('/')
+    }
+  } catch (err) {
+    errors.value.login = 'Erro interno. Tente novamente.'
+    console.error('Erro no login:', err)
+  }
+}
+
+// Handler do registro
+const handleRegister = async (event) => {
+  // Validar formulário antes de enviar
+  if (!validateRegisterForm()) {
+    return
+  }
+  
+  try {
+    const { user, error } = await signUp(registerForm.value.email, registerForm.value.password)
+    
+    if (error) {
+      // Tratar diferentes tipos de erro de registro
+      if (error.message?.includes('User already registered')) {
+        errors.value.register = 'Este email já está cadastrado'
+      } else if (error.message?.includes('Password should be at least')) {
+        errors.value.register = 'Senha deve ter pelo menos 6 caracteres'
+      } else if (error.message?.includes('Invalid email')) {
+        errors.value.register = 'Email inválido'
+      } else {
+        errors.value.register = error.message || 'Erro ao criar conta'
+      }
+      return
+    }
+    
+    // Sucesso - mostrar notificação
+    success('Conta criada com sucesso! Verifique seu email para confirmar.')
+    
+    // Limpar formulário após sucesso
+    registerForm.value = { email: '', password: '', confirmPassword: '' }
+  } catch (err) {
+    errors.value.register = 'Erro interno. Tente novamente.'
+    console.error('Erro no registro:', err)
+  }
 }
 </script>
 

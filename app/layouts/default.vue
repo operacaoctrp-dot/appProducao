@@ -10,6 +10,9 @@
     
     <!-- Footer -->
     <AppFooter />
+    
+    <!-- Notifications -->
+    <NotificationContainer />
   </div>
 </template>
 

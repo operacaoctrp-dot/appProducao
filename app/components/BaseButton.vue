@@ -181,9 +181,11 @@ const iconClasses = computed(() => {
 
 // Handler do click
 const handleClick = (event) => {
-  if (!props.disabled && !props.loading) {
-    emit('click', event)
+  if (props.disabled || props.loading) {
+    event.preventDefault()
+    return
   }
+  emit('click', event)
 }
 </script>
 
