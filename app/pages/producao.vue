@@ -26,8 +26,13 @@
               min="0"
             />
             <!-- Mensagem de erro para RSS -->
-            <div v-if="showValidationErrors && validationErrors.rss" class="mt-1">
-              <p class="text-sm text-red-500">RSS (Resíduo de Serviço de Saúde) é obrigatório</p>
+            <div
+              v-if="showValidationErrors && validationErrors.rss"
+              class="mt-1"
+            >
+              <p class="text-sm text-red-500">
+                RSS (Resíduo de Serviço de Saúde) é obrigatório
+              </p>
             </div>
           </div>
 
@@ -41,12 +46,12 @@
             min="0"
           />
 
-          <!-- RI Input -->
+          <!-- RI Input (Resíduo Industrial) -->
           <BaseInput
             v-model="formData.ri"
             label="RI (kg)"
             type="number"
-            placeholder="Digite o valor de RI em kg (opcional)"
+            placeholder="Digite o valor de RI em kg"
             step="0.1"
             min="0"
           />
@@ -67,7 +72,11 @@
             label="Data"
             type="date"
             required
-            :error-message="showValidationErrors && validationErrors.data ? 'Data da produção é obrigatória' : ''"
+            :error-message="
+              showValidationErrors && validationErrors.data
+                ? 'Data da produção é obrigatória'
+                : ''
+            "
           />
 
           <!-- Seleção de Imagem -->
@@ -82,8 +91,9 @@
                 type="button"
                 variant="outline"
                 size="md"
-                @click="triggerFileInput"
+                @click="triggerGallery"
                 class="flex-1"
+                data-capture="gallery"
               >
                 📁 Escolher da Galeria
               </BaseButton>
@@ -94,14 +104,24 @@
                 size="md"
                 @click="triggerCamera"
                 class="flex-1"
+                data-capture="camera"
               >
                 📷 Tirar Foto
               </BaseButton>
             </div>
 
-            <!-- Input de arquivo oculto -->
+            <!-- Input de arquivo para galeria (sem capture) -->
             <input
-              ref="fileInput"
+              ref="galleryInput"
+              type="file"
+              accept="image/*"
+              class="hidden"
+              @change="handleFileSelect"
+            />
+
+            <!-- Input de arquivo para câmera (com capture) -->
+            <input
+              ref="cameraInput"
               type="file"
               accept="image/*"
               capture="environment"
@@ -143,11 +163,11 @@
               v-else
               :class="[
                 'border-2 border-dashed rounded-lg p-6 text-center transition-colors cursor-pointer',
-                validationErrors.image 
-                  ? 'border-red-300 bg-red-50 hover:border-red-400' 
-                  : 'border-gray-300 hover:border-primary-400'
+                validationErrors.image
+                  ? 'border-red-300 bg-red-50 hover:border-red-400'
+                  : 'border-gray-300 hover:border-primary-400',
               ]"
-              @click="triggerFileInput"
+              @click="triggerGallery"
               @dragover.prevent
               @dragenter.prevent
               @drop.prevent="handleDrop"
@@ -158,9 +178,12 @@
               </p>
               <p class="text-xs text-text-tertiary mt-1">PNG, JPG até 5MB</p>
             </div>
-            
+
             <!-- Mensagem de erro para imagem -->
-            <div v-if="showValidationErrors && validationErrors.image" class="mt-2">
+            <div
+              v-if="showValidationErrors && validationErrors.image"
+              class="mt-2"
+            >
               <p class="text-sm text-red-500">Foto da produção é obrigatória</p>
             </div>
           </div>
@@ -180,8 +203,6 @@
           </div>
         </form>
       </div>
-
-
     </div>
   </div>
 </template>
@@ -195,13 +216,22 @@ const { success, error } = useToastNotification();
 // Supabase
 const supabase = useSupabase();
 
+// Função para obter data local no formato YYYY-MM-DD
+function getLocalDateString() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
 // Definir o layout e middleware de autenticação obrigatória
 definePageMeta({
   layout: "default",
-  middleware: "auth-required"
+  middleware: "auth-required",
 });
 
-// Meta tags para SEO
+// Meta tags para SEO e otimizações mobile
 useHead({
   title: "Produção - AppProdução",
   meta: [
@@ -209,6 +239,24 @@ useHead({
       name: "description",
       content: "Controle de produção - Registre os dados de produção diária",
     },
+    // Meta tags específicas para prevenir recarregamentos em mobile
+    {
+      name: "mobile-web-app-capable",
+      content: "yes"
+    },
+    {
+      name: "apple-mobile-web-app-capable", 
+      content: "yes"
+    },
+    {
+      name: "apple-mobile-web-app-status-bar-style",
+      content: "default"
+    },
+    // Prevenir zoom automático
+    {
+      name: "viewport",
+      content: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    }
   ],
 });
 
@@ -217,7 +265,7 @@ const formData = ref({
   rss: "",
   gb: "",
   ri: "",
-  data: new Date().toISOString().split("T")[0], // Data atual
+  data: getLocalDateString(), // Data atual no fuso horário local
 });
 
 const isLoading = ref(false);
@@ -228,16 +276,109 @@ const validationErrors = ref({
   gb: false,
   ri: false,
   data: false,
-  image: false
+  image: false,
 });
 
 const showValidationErrors = ref(false);
 
 // Estado da imagem
 const selectedImage = ref(null);
-const fileInput = ref(null);
+const galleryInput = ref(null);
+const cameraInput = ref(null);
 
+// Restaurar estado do formulário caso tenha havido recarregamento durante captura de foto
+onMounted(() => {
+  const savedFormState = sessionStorage.getItem('formState')
+  if (savedFormState) {
+    try {
+      const parsedState = JSON.parse(savedFormState)
+      console.log('Verificando estado salvo:', parsedState)
+      
+      // Só restaurar e mostrar toast se foi durante captura (tem flag capturing)
+      if (parsedState.capturing) {
+        console.log('Restaurando estado do formulário após captura:', parsedState)
+        
+        // Restaurar campos do formulário
+        if (parsedState.rss) formData.value.rss = parsedState.rss
+        if (parsedState.gb) formData.value.gb = parsedState.gb
+        if (parsedState.ri) formData.value.ri = parsedState.ri
+        if (parsedState.data) formData.value.data = parsedState.data
+        
+        // Mostrar toast informando que o estado foi restaurado
+        success('Estado do formulário restaurado após mudança de orientação!')
+      }
+      
+      // Limpar estado salvo
+      sessionStorage.removeItem('formState')
+    } catch (error) {
+      console.error('Erro ao restaurar estado do formulário:', error)
+    }
+  }
+})
 
+// Auto-salvar estado do formulário periodicamente durante o preenchimento
+watch(formData, (newData) => {
+  // Salvar no sessionStorage para recuperar em caso de recarregamento
+  sessionStorage.setItem('currentFormState', JSON.stringify(newData))
+}, { deep: true })
+
+// Adicionar proteção extra contra recarregamentos durante captura de foto
+onMounted(() => {
+  let isCapturingPhoto = false
+  
+  // Interceptar cliques nos botões de captura para marcar início
+  const galleryBtn = document.querySelector('[data-capture="gallery"]')
+  const cameraBtn = document.querySelector('[data-capture="camera"]')
+  
+  if (galleryBtn) {
+    galleryBtn.addEventListener('click', () => {
+      isCapturingPhoto = true
+      console.log('Início da captura via galeria')
+    })
+  }
+  
+  if (cameraBtn) {
+    cameraBtn.addEventListener('click', () => {
+      isCapturingPhoto = true
+      console.log('Início da captura via câmera')
+    })
+  }
+  
+  // Interceptar mudanças de orientação durante captura
+  const handleOrientationDuringCapture = (e) => {
+    if (isCapturingPhoto) {
+      console.log('Orientação mudou durante captura - forçando persistência')
+      e.preventDefault()
+      e.stopPropagation()
+      e.stopImmediatePropagation()
+      
+      // Salvar estado imediatamente
+      const currentState = {
+        ...formData.value,
+        timestamp: Date.now(),
+        capturing: true
+      }
+      sessionStorage.setItem('formState', JSON.stringify(currentState))
+      localStorage.setItem('formState', JSON.stringify(currentState))
+      
+      return false
+    }
+  }
+  
+  // Múltiplos listeners para capturar todas as mudanças
+  window.addEventListener('orientationchange', handleOrientationDuringCapture, { passive: false, capture: true })
+  screen.orientation?.addEventListener('change', handleOrientationDuringCapture, { passive: false, capture: true })
+  
+  // Limpar flag após processamento de arquivo
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.type === 'file') {
+      setTimeout(() => {
+        isCapturingPhoto = false
+        console.log('Flag de captura limpa após mudança em input file')
+      }, 2000)
+    }
+  })
+})
 
 // Calcula o total automaticamente
 const totalCalculado = computed(() => {
@@ -252,38 +393,40 @@ const totalCalculado = computed(() => {
 // Função para fazer upload da imagem
 async function uploadImage(file, fileName) {
   if (!supabase) {
-    throw new Error('Supabase não disponível')
+    throw new Error("Supabase não disponível");
   }
 
   // Debug: verificar se o usuário está autenticado
-  const { data: { user } } = await supabase.auth.getUser()
-  console.log('Usuário atual para upload:', user)
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  console.log("Usuário atual para upload:", user);
+
   if (!user) {
-    throw new Error('Usuário não autenticado')
+    throw new Error("Usuário não autenticado");
   }
 
   // Upload da imagem para o bucket Fotos
   const { data, error } = await supabase.storage
-    .from('Fotos')
+    .from("Fotos")
     .upload(fileName, file, {
-      cacheControl: '3600',
-      upsert: false
-    })
+      cacheControl: "3600",
+      upsert: false,
+    });
 
   if (error) {
-    console.error('Erro no upload:', error)
-    console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
-    throw error
+    console.error("Erro no upload:", error);
+    console.error("Detalhes do erro:", JSON.stringify(error, null, 2));
+    throw error;
   }
 
   // Obter a URL da imagem
   // Primeiro tenta URL pública
-  const { data: { publicUrl } } = supabase.storage
-    .from('Fotos')
-    .getPublicUrl(fileName)
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("Fotos").getPublicUrl(fileName);
 
-  console.log('URL pública gerada:', publicUrl)
+  console.log("URL pública gerada:", publicUrl);
 
   // Se preferir URL assinada (mais segura), descomente as linhas abaixo:
   /*
@@ -300,140 +443,149 @@ async function uploadImage(file, fileName) {
   return signedUrl
   */
 
-  return publicUrl
+  return publicUrl;
 }
 
 // Função para salvar os dados na tabela producao
 async function salvarProducao(dadosProducao) {
   if (!supabase) {
-    throw new Error('Supabase não disponível')
+    throw new Error("Supabase não disponível");
   }
 
   // Debug: verificar se o usuário está autenticado
-  const { data: { user } } = await supabase.auth.getUser()
-  console.log('Usuário atual para salvar dados:', user)
-  console.log('Dados a serem salvos:', dadosProducao)
-  
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  console.log("Usuário atual para salvar dados:", user);
+  console.log("Dados a serem salvos:", dadosProducao);
+
   if (!user) {
-    throw new Error('Usuário não autenticado')
+    throw new Error("Usuário não autenticado");
   }
 
   const { data, error } = await supabase
-    .from('producao')
+    .from("producao")
     .insert([dadosProducao])
-    .select()
+    .select();
 
   if (error) {
-    console.error('Erro ao salvar na tabela:', error)
-    console.error('Detalhes do erro:', JSON.stringify(error, null, 2))
-    throw error
+    console.error("Erro ao salvar na tabela:", error);
+    console.error("Detalhes do erro:", JSON.stringify(error, null, 2));
+    throw error;
   }
 
-  return data
+  return data;
 }
 
 // Função para enviar os dados
 async function handleSubmit() {
   // Ativar exibição de erros
-  showValidationErrors.value = true
-  
+  showValidationErrors.value = true;
+
   // Limpar erros anteriores
   validationErrors.value = {
     rss: false,
     gb: false,
     ri: false,
     data: false,
-    image: false
-  }
+    image: false,
+  };
 
   // Atribuir 0 aos campos opcionais se estiverem vazios
-  if (!formData.value.gb || formData.value.gb === '') {
-    formData.value.gb = 0
+  if (!formData.value.gb || formData.value.gb === "") {
+    formData.value.gb = 0;
   }
-  
-  if (!formData.value.ri || formData.value.ri === '') {
-    formData.value.ri = 0
+
+  if (!formData.value.ri || formData.value.ri === "") {
+    formData.value.ri = 0;
   }
 
   // Validação de campos obrigatórios
-  let hasErrors = false
-  
-  if (!formData.value.rss || formData.value.rss === '' || formData.value.rss <= 0) {
-    validationErrors.value.rss = true
-    hasErrors = true
+  let hasErrors = false;
+
+  if (
+    !formData.value.rss ||
+    formData.value.rss === "" ||
+    formData.value.rss <= 0
+  ) {
+    validationErrors.value.rss = true;
+    hasErrors = true;
   }
-  
+
   if (!formData.value.data) {
-    validationErrors.value.data = true
-    hasErrors = true
+    validationErrors.value.data = true;
+    hasErrors = true;
   }
-  
+
   if (!selectedImage.value) {
-    validationErrors.value.image = true
-    hasErrors = true
+    validationErrors.value.image = true;
+    hasErrors = true;
   }
 
   if (hasErrors) {
-    error("Por favor, preencha todos os campos obrigatórios e selecione uma foto.")
-    return
+    error(
+      "Por favor, preencha todos os campos obrigatórios e selecione uma foto."
+    );
+    return;
   }
 
   isLoading.value = true;
 
   try {
-    let fotoUrl = null
+    let fotoUrl = null;
 
     // Upload da imagem se existir
     if (selectedImage.value) {
-      const dataFormatada = formData.value.data.replace(/-/g, '')
-      const timestamp = new Date().getTime()
-      const extensao = selectedImage.value.file.name.split('.').pop()
-      const nomeArquivo = `foto_${dataFormatada}_${timestamp}.${extensao}`
-      
-      fotoUrl = await uploadImage(selectedImage.value.file, nomeArquivo)
+      const dataFormatada = formData.value.data.replace(/-/g, "");
+      const timestamp = new Date().getTime();
+      const extensao = selectedImage.value.file.name.split(".").pop();
+      const nomeArquivo = `foto_${dataFormatada}_${timestamp}.${extensao}`;
+
+      fotoUrl = await uploadImage(selectedImage.value.file, nomeArquivo);
     }
 
     // Preparar dados para salvar
     const dadosProducao = {
-      "RSS": parseFloat(formData.value.rss),
-      "GB": parseFloat(formData.value.gb),
-      "RI": parseFloat(formData.value.ri),
-      "Total": parseFloat(totalCalculado.value),
-      "DataFoto": new Date(formData.value.data).toISOString(),
-      "FotoFosso": fotoUrl
-    }
+      RSS: parseFloat(formData.value.rss),
+      GB: parseFloat(formData.value.gb),
+      RI: parseFloat(formData.value.ri),
+      Total: parseFloat(totalCalculado.value),
+      DataFoto: formData.value.data + "T12:00:00.000Z", // Salvar com horário meio-dia UTC para evitar problemas de fuso
+      FotoFosso: fotoUrl,
+    };
 
-    console.log("Salvando dados:", dadosProducao)
+    console.log("Salvando dados:", dadosProducao);
 
     // Salvar no Supabase
-    const resultado = await salvarProducao(dadosProducao)
+    const resultado = await salvarProducao(dadosProducao);
 
-    console.log("Dados salvos com sucesso:", resultado)
+    console.log("Dados salvos com sucesso:", resultado);
 
     // Mostrar toast de sucesso
-    success("Dados de produção salvos com sucesso!")
+    success("Dados de produção salvos com sucesso!");
 
     // Limpar formulário
-    resetForm()
+    resetForm();
 
     // Redirecionar para index após 2 segundos
     setTimeout(() => {
-      navigateTo('/')
-    }, 2000)
-
+      navigateTo("/");
+    }, 2000);
   } catch (erro) {
-    console.error("Erro ao salvar dados:", erro)
-    
+    console.error("Erro ao salvar dados:", erro);
+
     // Mostrar mensagem de erro específica
-    let mensagemErro = "Erro ao salvar os dados de produção. Tente novamente."
-    
-    if (erro.message?.includes('upload')) {
-      mensagemErro = "Erro ao fazer upload da imagem. Verifique o arquivo e tente novamente."
-    } else if (erro.message?.includes('Supabase não disponível')) {
-      mensagemErro = "Conexão com o banco de dados indisponível. Tente novamente."
+    let mensagemErro = "Erro ao salvar os dados de produção. Tente novamente.";
+
+    if (erro.message?.includes("upload")) {
+      mensagemErro =
+        "Erro ao fazer upload da imagem. Verifique o arquivo e tente novamente.";
+    } else if (erro.message?.includes("Supabase não disponível")) {
+      mensagemErro =
+        "Conexão com o banco de dados indisponível. Tente novamente.";
     }
-    
-    error(mensagemErro)
+
+    error(mensagemErro);
   } finally {
     isLoading.value = false;
   }
@@ -445,44 +597,95 @@ function resetForm() {
     rss: "",
     gb: "",
     ri: "",
-    data: new Date().toISOString().split("T")[0],
+    data: getLocalDateString(),
+  };
+  selectedImage.value = null;
+  if (galleryInput.value) {
+    galleryInput.value.value = "";
   }
-  selectedImage.value = null
-  if (fileInput.value) {
-    fileInput.value.value = ''
+  if (cameraInput.value) {
+    cameraInput.value.value = "";
   }
-  
+
   // Limpar erros de validação
   validationErrors.value = {
     rss: false,
     gb: false,
     ri: false,
     data: false,
-    image: false
+    image: false,
+  };
+
+  // Ocultar mensagens de erro
+  showValidationErrors.value = false;
+}
+
+// Função para salvar estado antes de capturar foto
+function saveStateBeforeCapture() {
+  const stateToSave = {
+    rss: formData.value.rss,
+    gb: formData.value.gb,
+    ri: formData.value.ri,
+    data: formData.value.data,
+    timestamp: Date.now()
+  }
+  sessionStorage.setItem('formState', JSON.stringify(stateToSave))
+  console.log('Estado salvo antes da captura:', stateToSave)
+  
+  // Notificar service worker sobre início da captura
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'CAPTURING_PHOTO'
+    })
   }
   
-  // Ocultar mensagens de erro
-  showValidationErrors.value = false
+  // Tentar bloquear orientação durante captura (se suportado)
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('portrait').catch(err => {
+      console.log('Não foi possível bloquear orientação:', err)
+    })
+  }
 }
 
 // Funções para manipulação de imagens
-function triggerFileInput() {
-  if (fileInput.value) {
-    fileInput.value.click();
+function triggerGallery() {
+  saveStateBeforeCapture()
+  if (galleryInput.value) {
+    galleryInput.value.click();
   }
 }
 
 function triggerCamera() {
-  if (fileInput.value) {
-    fileInput.value.setAttribute("capture", "environment");
-    fileInput.value.click();
+  saveStateBeforeCapture()
+  if (cameraInput.value) {
+    cameraInput.value.click();
   }
+}
+
+// Função para finalizar captura de foto
+function finalizeCaptureState() {
+  // Notificar service worker sobre fim da captura
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({
+      type: 'PHOTO_CAPTURED'
+    })
+  }
+  
+  // Desbloquear orientação
+  if (screen.orientation && screen.orientation.unlock) {
+    screen.orientation.unlock()
+  }
+  
+  console.log('Captura de foto finalizada - orientação desbloqueada')
 }
 
 function handleFileSelect(event) {
   const file = event.target.files[0];
   if (file) {
     processFile(file);
+  } else {
+    // Se cancelou a seleção, também finalizar
+    finalizeCaptureState();
   }
 }
 
@@ -497,12 +700,14 @@ function processFile(file) {
   // Validar tipo e tamanho
   if (!file.type.startsWith("image/")) {
     alert("Por favor, selecione apenas arquivos de imagem.");
+    finalizeCaptureState(); // Finalizar mesmo com erro
     return;
   }
 
   if (file.size > 5 * 1024 * 1024) {
     // 5MB
     alert("O arquivo deve ter no máximo 5MB.");
+    finalizeCaptureState(); // Finalizar mesmo com erro
     return;
   }
 
@@ -515,14 +720,23 @@ function processFile(file) {
       size: file.size,
       preview: e.target.result,
     };
+    
+    // Limpar erro de validação de imagem se existir
+    validationErrors.value.image = false;
+    
+    // Finalizar estado de captura
+    finalizeCaptureState();
   };
   reader.readAsDataURL(file);
 }
 
 function removeImage() {
   selectedImage.value = null;
-  if (fileInput.value) {
-    fileInput.value.value = "";
+  if (galleryInput.value) {
+    galleryInput.value.value = "";
+  }
+  if (cameraInput.value) {
+    cameraInput.value.value = "";
   }
 }
 

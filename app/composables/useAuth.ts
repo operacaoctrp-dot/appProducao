@@ -14,34 +14,82 @@ export const useSupabase = () => {
   return supabaseClient
 }
 
+// Estados globais persistentes com localStorage como backup
+const globalUser = ref<any>(null)
+const globalLoading = ref(false)
+const globalInitialized = ref(false)
+let authListenerSetup = false
+
+// Salvar/carregar estado do localStorage para persistir durante mudanças de orientação
+const saveAuthState = () => {
+  if (process.client && globalUser.value) {
+    localStorage.setItem('auth_user', JSON.stringify(globalUser.value))
+    localStorage.setItem('auth_initialized', 'true')
+  }
+}
+
+const loadAuthState = () => {
+  if (process.client) {
+    const savedUser = localStorage.getItem('auth_user')
+    const savedInitialized = localStorage.getItem('auth_initialized')
+    
+    if (savedUser) {
+      try {
+        globalUser.value = JSON.parse(savedUser)
+      } catch (e) {
+        console.warn('Erro ao carregar usuário do localStorage:', e)
+      }
+    }
+    
+    if (savedInitialized === 'true') {
+      globalInitialized.value = true
+    }
+  }
+}
+
 export const useAuth = () => {
-  const user = ref<any>(null)
-  const loading = ref(false)
-  const initialized = ref(false)
-  
   const supabase = useSupabase()
 
-  // Estado inicial do usuário
+  // Estado inicial do usuário - só executa uma vez
   onMounted(async () => {
-    if (supabase) {
+    // Carregar estado persistido primeiro
+    loadAuthState()
+    
+    // Se já foi inicializado, não faz nada
+    if (globalInitialized.value) {
+      return
+    }
+
+    if (supabase && !authListenerSetup) {
       try {
-        loading.value = true
+        console.log('Inicializando autenticação...')
         const { data: { user: currentUser } } = await supabase.auth.getUser()
-        user.value = currentUser
+        globalUser.value = currentUser
+        saveAuthState()
         
-        // Listener para mudanças de autenticação
+        // Listener para mudanças de autenticação - só configura uma vez
         supabase.auth.onAuthStateChange((event: any, session: any) => {
-          user.value = session?.user || null
+          console.log('Auth state changed:', event)
+          globalUser.value = session?.user || null
+          saveAuthState()
+          
+          // Limpar localStorage se fez logout
+          if (!session?.user) {
+            localStorage.removeItem('auth_user')
+          }
         })
+        
+        authListenerSetup = true
       } catch (error) {
         console.error('Erro ao verificar usuário:', error)
-        user.value = null
+        globalUser.value = null
       } finally {
-        loading.value = false
-        initialized.value = true
+        globalInitialized.value = true
+        saveAuthState()
+        console.log('Autenticação inicializada')
       }
     } else {
-      initialized.value = true
+      globalInitialized.value = true
     }
   })
 
@@ -52,7 +100,7 @@ export const useAuth = () => {
     }
 
     try {
-      loading.value = true
+      globalLoading.value = true
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
@@ -60,13 +108,13 @@ export const useAuth = () => {
 
       if (error) throw error
 
-      user.value = data.user
+      globalUser.value = data.user
       return { user: data.user, error: null }
     } catch (error) {
       console.error('Erro no login:', error)
       return { user: null, error }
     } finally {
-      loading.value = false
+      globalLoading.value = false
     }
   }
 
@@ -77,7 +125,7 @@ export const useAuth = () => {
     }
 
     try {
-      loading.value = true
+      globalLoading.value = true
       const { data, error } = await supabase.auth.signUp({
         email,
         password
@@ -90,37 +138,41 @@ export const useAuth = () => {
       console.error('Erro no registro:', error)
       return { user: null, error }
     } finally {
-      loading.value = false
+      globalLoading.value = false
     }
   }
 
   // Logout
   const signOut = async () => {
     if (!supabase) {
-      user.value = null
+      globalUser.value = null
+      localStorage.removeItem('auth_user')
+      localStorage.removeItem('auth_initialized')
       await navigateTo('/login')
       return
     }
 
     try {
-      loading.value = true
+      globalLoading.value = true
       const { error } = await supabase.auth.signOut()
       
       if (error) throw error
       
-      user.value = null
+      globalUser.value = null
+      localStorage.removeItem('auth_user')
+      localStorage.removeItem('auth_initialized')
       await navigateTo('/login')
     } catch (error) {
       console.error('Erro no logout:', error)
     } finally {
-      loading.value = false
+      globalLoading.value = false
     }
   }
 
   return {
-    user: readonly(user),
-    loading: readonly(loading),
-    initialized: readonly(initialized),
+    user: readonly(globalUser),
+    loading: readonly(globalLoading),
+    initialized: readonly(globalInitialized),
     signIn,
     signUp,
     signOut

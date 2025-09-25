@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS producao (
 COMMENT ON TABLE producao IS 'Tabela para armazenar dados de produção de resíduos';
 COMMENT ON COLUMN producao.rss IS 'Resíduo de Serviço de Saúde em kg';
 COMMENT ON COLUMN producao.gb IS 'Grupo B em kg';
-COMMENT ON COLUMN producao.ri IS 'Resíduo Infectante em kg';
+COMMENT ON COLUMN producao.ri IS 'Resíduo Industrial em kg';
 COMMENT ON COLUMN producao.total IS 'Total calculado em kg';
 COMMENT ON COLUMN producao.data_foto IS 'Data da produção';
 COMMENT ON COLUMN producao.foto_fosso IS 'URL da foto do fosso';
