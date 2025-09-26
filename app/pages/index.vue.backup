@@ -463,18 +463,24 @@ async function compartilharWhatsApp() {
   try {
     console.log('📱 Iniciando compartilhamento...');
     
-    // Mensagem ultra simples - só identificação
-    const agora = new Date();
-    const timestamp = agora.getTime(); // Mantém timestamp para anti-cache na URL
-    const mensagemFinal = `Gerado pelo App Produção em ${agora.toLocaleString('pt-BR')}`;
+    // Preparar texto da mensagem
+    const text = `📊 *Dados da Produção - ${formatarData(itemSelecionado.value.DataFoto)}*
+
+📅 Data: ${formatarData(itemSelecionado.value.DataFoto)}
+⚖️ RSS: ${itemSelecionado.value.RSS} kg
+⚖️ GB: ${itemSelecionado.value.GB} kg  
+⚖️ RI: ${itemSelecionado.value.RI} kg
+📈 *Total: ${itemSelecionado.value.Total} kg*
+
+Gerado pelo App Produção em ${new Date().toLocaleString('pt-BR')}`;
 
     // Tentar compartilhamento nativo primeiro
     if (navigator.share) {
       try {
         console.log('📱 Tentando compartilhamento nativo...');
         await navigator.share({
-          title: 'App Produção',
-          text: mensagemFinal
+          title: 'Dados da Produção',
+          text: text
         });
         success('� Compartilhado com sucesso!');
         isSalvando.value = false;
@@ -484,8 +490,20 @@ async function compartilharWhatsApp() {
       }
     }
 
-    // Usar a mesma mensagem final simples
-    const encodedText = encodeURIComponent(mensagemFinal);
+    // Preparar texto da mensagem
+    const text = `📊 *Dados da Produção - ${formatarData(itemSelecionado.value.DataFoto)}*
+
+📅 Data: ${formatarData(itemSelecionado.value.DataFoto)}
+⚖️ RSS: ${itemSelecionado.value.RSS} kg
+⚖️ GB: ${itemSelecionado.value.GB} kg  
+⚖️ RI: ${itemSelecionado.value.RI} kg
+📈 *Total: ${itemSelecionado.value.Total} kg*
+
+📸 Screenshot preparado - copie a imagem do modal se necessário!
+
+Gerado pelo App Produção em ${new Date().toLocaleString('pt-BR')}`;
+
+    const encodedText = encodeURIComponent(text);
     
     // Detectar se é dispositivo móvel
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
