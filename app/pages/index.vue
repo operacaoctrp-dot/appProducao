@@ -13,7 +13,61 @@
     <!-- Loading state -->
     <div v-if="loading" class="text-center py-12">
       <div
-        class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mb-4"
+        class="inline-block animate-spin rounded-full h-8 w-8    success('📱 WhatsApp aberto com os dados! Você pode copiar a imagem do modal se quiser compartilhar também.');
+    isSalvando.value = false;
+
+  } catch (error) {
+    console.error('Erro ao compartilhar:', error);
+    showError(`Erro ao preparar compartilhamento: ${error.message}`);
+    isSalvando.value = false;
+  }
+}
+
+// Função para baixar imagem do modal
+async function baixarImagem() {
+  if (!itemSelecionado.value) {
+    showError('Nenhum item selecionado');
+    return;
+  }
+
+  isSalvando.value = true;
+
+  try {
+    // Importar html2canvas dinamicamente
+    const html2canvas = await import('html2canvas');
+    
+    // Encontrar o elemento do modal
+    const modalElement = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-75 .bg-white.rounded-lg');
+    
+    if (!modalElement) {
+      throw new Error('Modal não encontrado');
+    }
+
+    // Capturar screenshot do modal
+    const canvas = await html2canvas.default(modalElement, {
+      backgroundColor: '#ffffff',
+      scale: 2, // Melhor qualidade
+      useCORS: true,
+      allowTaint: true,
+      width: modalElement.offsetWidth,
+      height: modalElement.offsetHeight
+    });
+
+    // Fazer download da imagem
+    const link = document.createElement('a');
+    link.download = `producao_${formatarData(itemSelecionado.value.DataFoto)}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+
+    success('📸 Screenshot baixada com sucesso!');
+    isSalvando.value = false;
+
+  } catch (error) {
+    console.error('Erro ao baixar imagem:', error);
+    showError(`Erro ao baixar imagem: ${error.message}`);
+    isSalvando.value = false;
+  }
+}-2 border-primary-500 mb-4"
       ></div>
       <p class="text-text-secondary">Carregando dados...</p>
     </div>
@@ -253,6 +307,28 @@
                   }}</span>
                 </div>
               </div>
+
+              <!-- Botões de ação -->
+              <div class="mt-6 space-y-3">
+                <button
+                  @click="compartilharWhatsApp"
+                  :disabled="isSalvando"
+                  class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <span v-if="isSalvando">📸 Preparando...</span>
+                  <span v-else>
+                    📱 Compartilhar no WhatsApp
+                  </span>
+                </button>
+                
+                <button
+                  @click="baixarImagem"
+                  :disabled="isSalvando"
+                  class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  📥 Baixar Screenshot
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -280,12 +356,16 @@ const { user, signOut, initialized } = useAuth();
 // Supabase
 const { $supabase: supabase } = useNuxtApp();
 
+// Notificações
+const { success, error: showError } = useNotification();
+
 // Estados reativos
 const dados = ref([]);
 const loading = ref(false);
 const error = ref("");
 const modalAberto = ref(false);
 const itemSelecionado = ref(null);
+const isSalvando = ref(false);
 
 // Função para carregar dados do banco
 async function carregarDados() {
@@ -367,6 +447,112 @@ function onImageError(event) {
   console.error("Erro ao carregar imagem:", event.target.src);
   // Opcional: substituir por imagem de placeholder
   // event.target.src = '/placeholder-image.png'
+}
+
+// Função para compartilhar no WhatsApp
+async function compartilharWhatsApp() {
+  if (!itemSelecionado.value) {
+    showError('Nenhum item selecionado');
+    return;
+  }
+
+  isSalvando.value = true;
+
+  try {
+    // Importar html2canvas dinamicamente
+    const html2canvas = await import('html2canvas');
+    
+    // Encontrar o elemento do modal
+    const modalElement = document.querySelector('.fixed.inset-0.bg-black.bg-opacity-75 .bg-white.rounded-lg');
+    
+    if (!modalElement) {
+      throw new Error('Modal não encontrado');
+    }
+
+    // Capturar screenshot do modal
+    const canvas = await html2canvas.default(modalElement, {
+      backgroundColor: '#ffffff',
+      scale: 2, // Melhor qualidade
+      useCORS: true,
+      allowTaint: true,
+      width: modalElement.offsetWidth,
+      height: modalElement.offsetHeight
+    });
+
+    // Tentar compartilhamento nativo primeiro (mobile)
+    if (navigator.share && navigator.canShare) {
+      try {
+        // Converter canvas para blob
+        const blob = await new Promise(resolve => {
+          canvas.toBlob(resolve, 'image/png', 1.0);
+        });
+        
+        const file = new File([blob], `producao_${formatarData(itemSelecionado.value.DataFoto)}.png`, { 
+          type: 'image/png' 
+        });
+        
+        const shareData = {
+          title: 'Dados da Produção',
+          text: `📊 Produção de ${formatarData(itemSelecionado.value.DataFoto)}`,
+          files: [file]
+        };
+        
+        if (navigator.canShare(shareData)) {
+          await navigator.share(shareData);
+          success('Compartilhado com sucesso!');
+          isSalvando.value = false;
+          return;
+        }
+      } catch (shareError) {
+        console.log('Compartilhamento nativo falhou:', shareError);
+      }
+    }
+
+    // Preparar texto da mensagem
+    const text = `📊 *Dados da Produção - ${formatarData(itemSelecionado.value.DataFoto)}*
+
+📅 Data: ${formatarData(itemSelecionado.value.DataFoto)}
+⚖️ RSS: ${itemSelecionado.value.RSS} kg
+⚖️ GB: ${itemSelecionado.value.GB} kg  
+⚖️ RI: ${itemSelecionado.value.RI} kg
+📈 *Total: ${itemSelecionado.value.Total} kg*
+
+📸 Screenshot preparado - copie a imagem do modal se necessário!
+
+Gerado pelo App Produção em ${new Date().toLocaleString('pt-BR')}`;
+
+    const encodedText = encodeURIComponent(text);
+    
+    // Detectar se é dispositivo móvel
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+      // Mobile: tentar abrir o app do WhatsApp diretamente
+      const whatsappAppURL = `whatsapp://send?text=${encodedText}`;
+      
+      // Tentar abrir o app
+      window.location.href = whatsappAppURL;
+      
+      // Fallback: se não conseguir abrir o app em 2 segundos, abrir no navegador
+      setTimeout(() => {
+        const whatsappWebURL = `https://api.whatsapp.com/send?text=${encodedText}`;
+        window.open(whatsappWebURL, '_blank');
+      }, 2000);
+      
+    } else {
+      // Desktop: usar WhatsApp Web
+      const whatsappURL = `https://web.whatsapp.com/send?text=${encodedText}`;
+      window.open(whatsappURL, '_blank');
+    }
+    
+    success('� WhatsApp aberto com os dados! Você pode copiar a imagem do modal se quiser compartilhar também.');
+    isSalvando.value = false;
+
+  } catch (error) {
+    console.error('Erro ao compartilhar:', error);
+    showError(`Erro ao preparar compartilhamento: ${error.message}`);
+    isSalvando.value = false;
+  }
 }
 
 // Função de logout
