@@ -31,6 +31,13 @@
             Produção
           </NuxtLink>
           <NuxtLink
+            to="/estatisticas"
+            class="text-text-secondary hover:text-primary-500 transition-colors font-medium"
+            active-class="text-primary-500 font-semibold"
+          >
+            📊 Estatísticas
+          </NuxtLink>
+          <NuxtLink
             to="#"
             class="text-text-secondary hover:text-primary-500 transition-colors font-medium"
             active-class="text-primary-500 font-semibold"
@@ -111,6 +118,14 @@
               @click="closeMobileMenu"
             >
               Produção
+            </NuxtLink>
+            <NuxtLink
+              to="/estatisticas"
+              class="block px-3 py-2 text-text-secondary hover:text-primary-500 hover:bg-primary-50 rounded-md transition-colors"
+              active-class="text-primary-500 bg-primary-50 font-semibold"
+              @click="closeMobileMenu"
+            >
+              📊 Estatísticas
             </NuxtLink>
             <NuxtLink
               to="#"
