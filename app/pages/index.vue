@@ -61,41 +61,117 @@
 
           <!-- Médias por Semana -->
           <div v-if="mediasProducao.semanas.length > 0" class="lg:col-span-3">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div
-                v-for="(semana, index) in mediasProducao.semanas"
-                :key="index"
-                class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+            <!-- Navegação do Carrossel de Semanas -->
+            <div class="flex items-center justify-between mb-4">
+              <!-- Botão Anterior -->
+              <button
+                @click="semanaAnterior"
+                :disabled="semanaAtualIndex === 0"
+                class="p-2 rounded-full bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
               >
-                <p class="text-sm font-semibold text-gray-800 mb-3">
-                  Semana {{ semana.numero }} ({{ semana.dataInicio }} -
-                  {{ semana.dataFim }})
-                </p>
-                <div class="space-y-2 text-xs">
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">RSS:</span>
-                    <span class="font-bold text-emerald-600"
-                      >{{ formatNumber(semana.rss) }} kg</span
-                    >
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">GB:</span>
-                    <span class="font-bold text-amber-600"
-                      >{{ formatNumber(semana.gb) }} kg</span
-                    >
-                  </div>
-                  <div class="flex justify-between">
-                    <span class="text-gray-600">RI:</span>
-                    <span class="font-bold text-purple-600"
-                      >{{ formatNumber(semana.ri) }} kg</span
-                    >
-                  </div>
-                  <div class="border-t pt-2 flex justify-between">
-                    <span class="font-medium text-gray-700">Total:</span>
-                    <span class="font-bold text-blue-600"
-                      >{{ formatNumber(semana.total) }} kg</span
-                    >
-                  </div>
+                <svg
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 19l-7-7 7-7"
+                  />
+                </svg>
+              </button>
+
+              <!-- Indicadores de navegação (dots) -->
+              <div class="flex justify-center gap-2">
+                <button
+                  v-for="(semana, index) in mediasProducao.semanas"
+                  :key="index"
+                  @click="irParaSemana(index)"
+                  :class="[
+                    'h-2 rounded-full transition-all',
+                    index === semanaAtualIndex
+                      ? 'bg-primary-500 w-8'
+                      : 'bg-gray-300 hover:bg-gray-400 w-2',
+                  ]"
+                  :title="`Semana ${semana.numero}`"
+                />
+              </div>
+
+              <!-- Botão Próximo -->
+              <button
+                @click="semanaProxima"
+                :disabled="
+                  semanaAtualIndex === mediasProducao.semanas.length - 1
+                "
+                class="p-2 rounded-full bg-primary-500 text-white hover:bg-primary-600 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+              >
+                <svg
+                  class="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 5l7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Card da Semana Atual -->
+            <div
+              class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transition-all duration-300"
+            >
+              <p class="text-sm font-semibold text-gray-800 mb-3">
+                Semana
+                {{ mediasProducao.semanas[semanaAtualIndex].numero }}
+                ({{ mediasProducao.semanas[semanaAtualIndex].dataInicio }} -
+                {{ mediasProducao.semanas[semanaAtualIndex].dataFim }})
+              </p>
+              <div class="space-y-2 text-xs">
+                <div class="flex justify-between">
+                  <span class="text-gray-600">RSS:</span>
+                  <span class="font-bold text-emerald-600"
+                    >{{
+                      formatNumber(mediasProducao.semanas[semanaAtualIndex].rss)
+                    }}
+                    kg</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">GB:</span>
+                  <span class="font-bold text-amber-600"
+                    >{{
+                      formatNumber(mediasProducao.semanas[semanaAtualIndex].gb)
+                    }}
+                    kg</span
+                  >
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-gray-600">RI:</span>
+                  <span class="font-bold text-purple-600"
+                    >{{
+                      formatNumber(mediasProducao.semanas[semanaAtualIndex].ri)
+                    }}
+                    kg</span
+                  >
+                </div>
+                <div class="border-t pt-2 flex justify-between">
+                  <span class="font-medium text-gray-700">Total:</span>
+                  <span class="font-bold text-blue-600"
+                    >{{
+                      formatNumber(
+                        mediasProducao.semanas[semanaAtualIndex].total
+                      )
+                    }}
+                    kg</span
+                  >
                 </div>
               </div>
             </div>
@@ -587,7 +663,7 @@ const modalExclusao = ref({
 
 // Estado do carrossel
 const mesAtualIndex = ref(0);
-
+const semanaAtualIndex = ref(0);
 // Nomes dos meses em português
 const nomesMeses = [
   "Janeiro",
@@ -773,6 +849,22 @@ function mesProximo() {
 
 function irParaMes(index) {
   mesAtualIndex.value = index;
+}
+
+function semanaAnterior() {
+  if (semanaAtualIndex.value > 0) {
+    semanaAtualIndex.value--;
+  }
+}
+
+function semanaProxima() {
+  if (semanaAtualIndex.value < mediasProducao.value.semanas.length - 1) {
+    semanaAtualIndex.value++;
+  }
+}
+
+function irParaSemana(index) {
+  semanaAtualIndex.value = index;
 }
 
 // Função para carregar dados do banco
