@@ -328,47 +328,48 @@
             </div>
           </div>
 
-          <!-- Média Semanal -->
+          <!-- Médias por Semana -->
           <div
-            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+            class="lg:col-span-1 bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
           >
             <h3
               class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
             >
-              <span class="text-2xl">📊</span> Média Semanal
+              <span class="text-2xl">📅</span> Médias por Semana
             </h3>
-            <div class="space-y-4">
+            <div class="space-y-3 max-h-96 overflow-y-auto">
               <div
-                class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4"
+                v-for="(semana, index) in mediasProducao.semanas"
+                :key="index"
+                class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200"
               >
-                <p class="text-sm text-emerald-600 font-medium">RSS</p>
-                <p class="text-2xl font-bold text-emerald-700">
-                  {{ formatNumber(mediasProducao.semanal.rss) }} kg
+                <p class="text-sm font-semibold text-blue-900 mb-2">
+                  Semana {{ semana.numero }} ({{ semana.dataInicio }} - {{ semana.dataFim }})
                 </p>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                  <div class="bg-emerald-100 rounded px-2 py-1">
+                    <p class="text-emerald-600 font-medium">RSS</p>
+                    <p class="text-emerald-700 font-bold">{{ formatNumber(semana.rss) }}</p>
+                  </div>
+                  <div class="bg-amber-100 rounded px-2 py-1">
+                    <p class="text-amber-600 font-medium">GB</p>
+                    <p class="text-amber-700 font-bold">{{ formatNumber(semana.gb) }}</p>
+                  </div>
+                  <div class="bg-purple-100 rounded px-2 py-1">
+                    <p class="text-purple-600 font-medium">RI</p>
+                    <p class="text-purple-700 font-bold">{{ formatNumber(semana.ri) }}</p>
+                  </div>
+                </div>
+                <div class="mt-2 bg-blue-200 rounded px-2 py-1">
+                  <p class="text-blue-600 font-medium text-xs">TOTAL</p>
+                  <p class="text-blue-700 font-bold">{{ formatNumber(semana.total) }}</p>
+                </div>
               </div>
               <div
-                class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4"
+                v-if="mediasProducao.semanas.length === 0"
+                class="text-center py-4 text-gray-400"
               >
-                <p class="text-sm text-amber-600 font-medium">GB</p>
-                <p class="text-2xl font-bold text-amber-700">
-                  {{ formatNumber(mediasProducao.semanal.gb) }} kg
-                </p>
-              </div>
-              <div
-                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4"
-              >
-                <p class="text-sm text-purple-600 font-medium">RI</p>
-                <p class="text-2xl font-bold text-purple-700">
-                  {{ formatNumber(mediasProducao.semanal.ri) }} kg
-                </p>
-              </div>
-              <div
-                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300"
-              >
-                <p class="text-sm text-blue-600 font-medium">TOTAL</p>
-                <p class="text-2xl font-bold text-blue-700">
-                  {{ formatNumber(mediasProducao.semanal.total) }} kg
-                </p>
+                Nenhuma semana com dados
               </div>
             </div>
           </div>
@@ -879,7 +880,7 @@ const mediasProducao = computed(() => {
     return {
       diaria: { rss: 0, gb: 0, ri: 0, total: 0 },
       mensal: { rss: 0, gb: 0, ri: 0, total: 0 },
-      semanal: { rss: 0, gb: 0, ri: 0, total: 0 },
+      semanas: [],
     };
   }
 
@@ -899,42 +900,90 @@ const mediasProducao = computed(() => {
     total: totalGeral / data.length,
   };
 
-  // Média Mensal - considerar quantos meses têm dados
+  // Média Mensal
   const meses = new Set();
   data.forEach((item) => {
     const date = new Date(item.DataFoto);
     meses.add(`${date.getFullYear()}-${date.getMonth()}`);
   });
 
-  const mediaMenusal = {
+  const mediaMensal = {
     rss: totalRss / meses.size,
     gb: totalGb / meses.size,
     ri: totalRi / meses.size,
     total: totalGeral / meses.size,
   };
 
-  // Média Semanal (segunda a domingo) - considerar quantas semanas têm dados
-  const semanas = new Set();
+  // Médias por Semana Específica
+  const semanaMap = new Map();
+
   data.forEach((item) => {
     const date = new Date(item.DataFoto);
+    
+    // Calcular o primeiro dia da semana (segunda-feira)
+    const dia = date.getDate();
+    const mes = date.getMonth();
     const ano = date.getFullYear();
-    const semana = Math.ceil(
-      (date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1)) / 7
-    );
-    semanas.add(`${ano}-W${semana}`);
+    
+    // Descobrir o dia da semana (0 = domingo, 1 = segunda, etc.)
+    const diaSemana = date.getDay();
+    
+    // Calcular quantos dias voltar para chegar à segunda-feira
+    const diasParaVoltarParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+    
+    // Data da segunda-feira (início da semana)
+    const dataSegunda = new Date(ano, mes, dia - diasParaVoltarParaSegunda);
+    const numSemana = Math.ceil((date.getDate() + new Date(ano, mes, 1).getDay() - 1) / 7);
+    
+    const chaveSegunda = `${dataSegunda.getFullYear()}-${String(dataSegunda.getMonth() + 1).padStart(2, '0')}-${String(dataSegunda.getDate()).padStart(2, '0')}`;
+
+    if (!semanaMap.has(chaveSegunda)) {
+      semanaMap.set(chaveSegunda, {
+        dataSegunda: dataSegunda,
+        numeroSemana: numSemana,
+        count: 0,
+        rss: 0,
+        gb: 0,
+        ri: 0,
+        total: 0,
+      });
+    }
+
+    const semana = semanaMap.get(chaveSegunda);
+    semana.count++;
+    semana.rss += Number(item.RSS || 0);
+    semana.gb += Number(item.GB || 0);
+    semana.ri += Number(item.RI || 0);
+    semana.total += Number(item.Total || 0);
   });
 
-  const mediaSemanal = {
-    rss: totalRss / semanas.size,
-    gb: totalGb / semanas.size,
-    ri: totalRi / semanas.size,
-    total: totalGeral / semanas.size,
-  };
+  // Converter para array e formatar
+  const semanas = Array.from(semanaMap.values())
+    .sort((a, b) => a.dataSegunda - b.dataSegunda)
+    .map((semana, index) => {
+      const dataSegunda = semana.dataSegunda;
+      const dataDomingo = new Date(dataSegunda);
+      dataDomingo.setDate(dataDomingo.getDate() + 6);
+
+      const formatarData = (date) => {
+        return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+      };
+
+      return {
+        numero: index + 1,
+        dataInicio: formatarData(dataSegunda),
+        dataFim: formatarData(dataDomingo),
+        rss: semana.rss / semana.count,
+        gb: semana.gb / semana.count,
+        ri: semana.ri / semana.count,
+        total: semana.total / semana.count,
+      };
+    });
 
   return {
     diaria: mediaDiaria,
-    mensal: mediaMenusal,
-    semanal: mediaSemanal,
+    mensal: mediaMensal,
+    semanas: semanas,
   };
 });
 
