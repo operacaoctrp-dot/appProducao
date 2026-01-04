@@ -11,30 +11,45 @@
         </p>
       </div>
 
-      <!-- Resumo do Mês e Médias por Semana -->
+      <!-- Títulos das Seções -->
       <div class="mb-8">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+          <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+            <span>📊</span> {{ mesesDisponiveis[mesAtualIndex]?.label }}
+          </h3>
+          <h3 v-if="mediasProducao.semanas.length > 0" class="lg:col-span-3 text-lg font-semibold text-text-primary flex items-center gap-2">
+            <span>📅</span> Médias por Semana
+          </h3>
+        </div>
+
+        <!-- Cards -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
           <!-- Card de Resumo do Mês -->
           <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <p class="text-sm font-semibold text-gray-800 mb-3">
-              Resumo de {{ mesesDisponiveis[mesAtualIndex]?.label }}
-            </p>
             <div class="space-y-2 text-xs">
               <div class="flex justify-between">
                 <span class="text-gray-600">RSS:</span>
-                <span class="font-bold text-emerald-600">{{ formatNumber(resumoMesAtual.totalRSS) }} kg</span>
+                <span class="font-bold text-emerald-600"
+                  >{{ formatNumber(resumoMesAtual.totalRSS) }} kg</span
+                >
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">GB:</span>
-                <span class="font-bold text-amber-600">{{ formatNumber(resumoMesAtual.totalGB) }} kg</span>
+                <span class="font-bold text-amber-600"
+                  >{{ formatNumber(resumoMesAtual.totalGB) }} kg</span
+                >
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">RI:</span>
-                <span class="font-bold text-purple-600">{{ formatNumber(resumoMesAtual.totalRI) }} kg</span>
+                <span class="font-bold text-purple-600"
+                  >{{ formatNumber(resumoMesAtual.totalRI) }} kg</span
+                >
               </div>
               <div class="border-t pt-2 flex justify-between">
                 <span class="font-medium text-gray-700">Total:</span>
-                <span class="font-bold text-blue-600">{{ formatNumber(resumoMesAtual.totalGeral) }} kg</span>
+                <span class="font-bold text-blue-600"
+                  >{{ formatNumber(resumoMesAtual.totalGeral) }} kg</span
+                >
               </div>
             </div>
           </div>
