@@ -192,7 +192,11 @@ const { user, signOut } = useAuth();
 
 // Handler para logout
 const handleSignOut = async () => {
-  await signOut();
+  try {
+    await signOut();
+  } catch (error) {
+    console.error('Erro ao fazer logout:', error);
+  }
 };
 
 // Funções para controlar o menu mobile

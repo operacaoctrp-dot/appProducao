@@ -144,26 +144,29 @@ export const useAuth = () => {
 
   // Logout
   const signOut = async () => {
-    if (!supabase) {
-      globalUser.value = null
-      localStorage.removeItem('auth_user')
-      localStorage.removeItem('auth_initialized')
-      await navigateTo('/login')
-      return
-    }
-
     try {
       globalLoading.value = true
-      const { error } = await supabase.auth.signOut()
       
-      if (error) throw error
+      if (supabase) {
+        const { error } = await supabase.auth.signOut()
+        if (error) throw error
+      }
       
       globalUser.value = null
       localStorage.removeItem('auth_user')
       localStorage.removeItem('auth_initialized')
+      authListenerSetup = false
+      
+      // Navegar para login
       await navigateTo('/login')
     } catch (error) {
       console.error('Erro no logout:', error)
+      // Mesmo com erro, limpar dados locais e redirecionar
+      globalUser.value = null
+      localStorage.removeItem('auth_user')
+      localStorage.removeItem('auth_initialized')
+      authListenerSetup = false
+      await navigateTo('/login')
     } finally {
       globalLoading.value = false
     }
