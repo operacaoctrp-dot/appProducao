@@ -18,49 +18,43 @@
         >
           <span>📊</span> Resumo de {{ mesesDisponiveis[mesAtualIndex]?.label }}
         </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <p class="text-sm font-semibold text-gray-800 mb-3">Total RSS</p>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Total:</span>
-                <span class="font-bold text-emerald-600"
-                  >{{ formatNumber(resumoMesAtual.totalRSS) }} kg</span
-                >
-              </div>
+        <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+          <div class="space-y-4">
+            <!-- Total RSS -->
+            <div
+              class="flex justify-between items-center pb-4 border-b border-gray-100"
+            >
+              <span class="text-sm font-semibold text-gray-800">Total RSS</span>
+              <span class="font-bold text-emerald-600 text-lg"
+                >{{ formatNumber(resumoMesAtual.totalRSS) }} kg</span
+              >
             </div>
-          </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <p class="text-sm font-semibold text-gray-800 mb-3">Total GB</p>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Total:</span>
-                <span class="font-bold text-amber-600"
-                  >{{ formatNumber(resumoMesAtual.totalGB) }} kg</span
-                >
-              </div>
+            <!-- Total GB -->
+            <div
+              class="flex justify-between items-center pb-4 border-b border-gray-100"
+            >
+              <span class="text-sm font-semibold text-gray-800">Total GB</span>
+              <span class="font-bold text-amber-600 text-lg"
+                >{{ formatNumber(resumoMesAtual.totalGB) }} kg</span
+              >
             </div>
-          </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
-            <p class="text-sm font-semibold text-gray-800 mb-3">Total RI</p>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Total:</span>
-                <span class="font-bold text-purple-600"
-                  >{{ formatNumber(resumoMesAtual.totalRI) }} kg</span
-                >
-              </div>
+            <!-- Total RI -->
+            <div
+              class="flex justify-between items-center pb-4 border-b border-gray-100"
+            >
+              <span class="text-sm font-semibold text-gray-800">Total RI</span>
+              <span class="font-bold text-purple-600 text-lg"
+                >{{ formatNumber(resumoMesAtual.totalRI) }} kg</span
+              >
             </div>
-          </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm border border-blue-200">
-            <p class="text-sm font-semibold text-gray-800 mb-3">Total Geral</p>
-            <div class="space-y-2 text-xs">
-              <div class="flex justify-between">
-                <span class="text-gray-600">Total:</span>
-                <span class="font-bold text-blue-600"
-                  >{{ formatNumber(resumoMesAtual.totalGeral) }} kg</span
-                >
-              </div>
+            <!-- Total Geral -->
+            <div class="flex justify-between items-center">
+              <span class="text-sm font-semibold text-gray-800"
+                >Total Geral</span
+              >
+              <span class="font-bold text-blue-600 text-lg"
+                >{{ formatNumber(resumoMesAtual.totalGeral) }} kg</span
+              >
             </div>
           </div>
         </div>
