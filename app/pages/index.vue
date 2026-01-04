@@ -12,36 +12,56 @@
       </div>
 
       <!-- Resumo do Mês Atual -->
-      <div
-        class="mb-8 bg-gradient-to-r from-primary-50 to-primary-100 rounded-lg p-6 border border-primary-200"
-      >
-        <h3 class="text-lg font-semibold text-primary-800 mb-4">
-          📊 Resumo de {{ mesesDisponiveis[mesAtualIndex]?.label }}
+      <div class="mb-8">
+        <h3
+          class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2"
+        >
+          <span>📊</span> Resumo de {{ mesesDisponiveis[mesAtualIndex]?.label }}
         </h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="bg-white rounded-lg p-4 shadow-sm">
-            <p class="text-sm text-gray-500">Total RSS</p>
-            <p class="text-xl font-bold text-primary-600">
-              {{ resumoMesAtual.totalRSS.toFixed(2) }} kg
-            </p>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <p class="text-sm font-semibold text-gray-800 mb-3">Total RSS</p>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total:</span>
+                <span class="font-bold text-emerald-600"
+                  >{{ formatNumber(resumoMesAtual.totalRSS) }} kg</span
+                >
+              </div>
+            </div>
           </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm">
-            <p class="text-sm text-gray-500">Total GB</p>
-            <p class="text-xl font-bold text-primary-600">
-              {{ resumoMesAtual.totalGB.toFixed(2) }} kg
-            </p>
+          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <p class="text-sm font-semibold text-gray-800 mb-3">Total GB</p>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total:</span>
+                <span class="font-bold text-amber-600"
+                  >{{ formatNumber(resumoMesAtual.totalGB) }} kg</span
+                >
+              </div>
+            </div>
           </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm">
-            <p class="text-sm text-gray-500">Total RI</p>
-            <p class="text-xl font-bold text-primary-600">
-              {{ resumoMesAtual.totalRI.toFixed(2) }} kg
-            </p>
+          <div class="bg-white rounded-lg p-4 shadow-sm border border-gray-200">
+            <p class="text-sm font-semibold text-gray-800 mb-3">Total RI</p>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total:</span>
+                <span class="font-bold text-purple-600"
+                  >{{ formatNumber(resumoMesAtual.totalRI) }} kg</span
+                >
+              </div>
+            </div>
           </div>
-          <div class="bg-white rounded-lg p-4 shadow-sm">
-            <p class="text-sm text-gray-500">Total Geral</p>
-            <p class="text-xl font-bold text-primary-600">
-              {{ resumoMesAtual.totalGeral.toFixed(2) }} kg
-            </p>
+          <div class="bg-white rounded-lg p-4 shadow-sm border border-blue-200">
+            <p class="text-sm font-semibold text-gray-800 mb-3">Total Geral</p>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-600">Total:</span>
+                <span class="font-bold text-blue-600"
+                  >{{ formatNumber(resumoMesAtual.totalGeral) }} kg</span
+                >
+              </div>
+            </div>
           </div>
         </div>
       </div>
