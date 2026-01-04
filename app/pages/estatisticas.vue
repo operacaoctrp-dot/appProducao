@@ -344,25 +344,34 @@
                 class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-3 border border-blue-200"
               >
                 <p class="text-sm font-semibold text-blue-900 mb-2">
-                  Semana {{ semana.numero }} ({{ semana.dataInicio }} - {{ semana.dataFim }})
+                  Semana {{ semana.numero }} ({{ semana.dataInicio }} -
+                  {{ semana.dataFim }})
                 </p>
                 <div class="grid grid-cols-3 gap-2 text-xs">
                   <div class="bg-emerald-100 rounded px-2 py-1">
                     <p class="text-emerald-600 font-medium">RSS</p>
-                    <p class="text-emerald-700 font-bold">{{ formatNumber(semana.rss) }}</p>
+                    <p class="text-emerald-700 font-bold">
+                      {{ formatNumber(semana.rss) }}
+                    </p>
                   </div>
                   <div class="bg-amber-100 rounded px-2 py-1">
                     <p class="text-amber-600 font-medium">GB</p>
-                    <p class="text-amber-700 font-bold">{{ formatNumber(semana.gb) }}</p>
+                    <p class="text-amber-700 font-bold">
+                      {{ formatNumber(semana.gb) }}
+                    </p>
                   </div>
                   <div class="bg-purple-100 rounded px-2 py-1">
                     <p class="text-purple-600 font-medium">RI</p>
-                    <p class="text-purple-700 font-bold">{{ formatNumber(semana.ri) }}</p>
+                    <p class="text-purple-700 font-bold">
+                      {{ formatNumber(semana.ri) }}
+                    </p>
                   </div>
                 </div>
                 <div class="mt-2 bg-blue-200 rounded px-2 py-1">
                   <p class="text-blue-600 font-medium text-xs">TOTAL</p>
-                  <p class="text-blue-700 font-bold">{{ formatNumber(semana.total) }}</p>
+                  <p class="text-blue-700 font-bold">
+                    {{ formatNumber(semana.total) }}
+                  </p>
                 </div>
               </div>
               <div
@@ -919,23 +928,27 @@ const mediasProducao = computed(() => {
 
   data.forEach((item) => {
     const date = new Date(item.DataFoto);
-    
+
     // Calcular o primeiro dia da semana (segunda-feira)
     const dia = date.getDate();
     const mes = date.getMonth();
     const ano = date.getFullYear();
-    
+
     // Descobrir o dia da semana (0 = domingo, 1 = segunda, etc.)
     const diaSemana = date.getDay();
-    
+
     // Calcular quantos dias voltar para chegar à segunda-feira
     const diasParaVoltarParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
-    
+
     // Data da segunda-feira (início da semana)
     const dataSegunda = new Date(ano, mes, dia - diasParaVoltarParaSegunda);
-    const numSemana = Math.ceil((date.getDate() + new Date(ano, mes, 1).getDay() - 1) / 7);
-    
-    const chaveSegunda = `${dataSegunda.getFullYear()}-${String(dataSegunda.getMonth() + 1).padStart(2, '0')}-${String(dataSegunda.getDate()).padStart(2, '0')}`;
+    const numSemana = Math.ceil(
+      (date.getDate() + new Date(ano, mes, 1).getDay() - 1) / 7
+    );
+
+    const chaveSegunda = `${dataSegunda.getFullYear()}-${String(
+      dataSegunda.getMonth() + 1
+    ).padStart(2, "0")}-${String(dataSegunda.getDate()).padStart(2, "0")}`;
 
     if (!semanaMap.has(chaveSegunda)) {
       semanaMap.set(chaveSegunda, {
@@ -966,7 +979,9 @@ const mediasProducao = computed(() => {
       dataDomingo.setDate(dataDomingo.getDate() + 6);
 
       const formatarData = (date) => {
-        return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
+        return `${String(date.getDate()).padStart(2, "0")}/${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}`;
       };
 
       return {
