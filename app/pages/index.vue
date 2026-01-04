@@ -126,15 +126,15 @@
 
             <!-- Card da Semana Atual -->
             <div
-              class="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transition-all duration-300"
+              class="bg-white rounded-lg p-2 shadow-sm border border-gray-200 transition-all duration-300"
             >
-              <p class="text-sm font-semibold text-gray-800 mb-3">
+              <p class="text-xs font-semibold text-gray-800 mb-2">
                 Semana
                 {{ mediasProducao.semanas[semanaAtualIndex].numero }}
                 ({{ mediasProducao.semanas[semanaAtualIndex].dataInicio }} -
                 {{ mediasProducao.semanas[semanaAtualIndex].dataFim }})
               </p>
-              <div class="space-y-2 text-xs">
+              <div class="space-y-1 text-xs">
                 <div class="flex justify-between">
                   <span class="text-gray-600">RSS:</span>
                   <span class="font-bold text-emerald-600"
@@ -162,7 +162,7 @@
                     kg</span
                   >
                 </div>
-                <div class="border-t pt-2 flex justify-between">
+                <div class="border-t pt-1 flex justify-between">
                   <span class="font-medium text-gray-700">Total:</span>
                   <span class="font-bold text-blue-600"
                     >{{
