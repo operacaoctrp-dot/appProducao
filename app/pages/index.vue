@@ -1,150 +1,5 @@
 <template>
   <div v-if="user" class="min-h-screen">
-    <!-- Card de Resumo Fixo -->
-    <div class="sticky top-16 z-40 bg-white shadow-lg border-b border-gray-200">
-      <div class="container mx-auto px-4 py-6">
-        <h2
-          class="text-2xl font-bold text-text-primary mb-4 flex items-center gap-2"
-        >
-          <span class="text-2xl">📊</span> Resumo de {{ mêsAtualLabel }}
-        </h2>
-
-        <!-- Cards de Resumo Mensal -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-          <div
-            class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-lg p-3 border border-emerald-200"
-          >
-            <p class="text-xs text-emerald-600 font-medium">Total RSS</p>
-            <p class="text-lg font-bold text-emerald-700">
-              {{ formatNumber(resumoMês.totalRss) }} kg
-            </p>
-          </div>
-          <div
-            class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-lg p-3 border border-amber-200"
-          >
-            <p class="text-xs text-amber-600 font-medium">Total GB</p>
-            <p class="text-lg font-bold text-amber-700">
-              {{ formatNumber(resumoMês.totalGb) }} kg
-            </p>
-          </div>
-          <div
-            class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-3 border border-purple-200"
-          >
-            <p class="text-xs text-purple-600 font-medium">Total RI</p>
-            <p class="text-lg font-bold text-purple-700">
-              {{ formatNumber(resumoMês.totalRi) }} kg
-            </p>
-          </div>
-          <div
-            class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-3 border-2 border-blue-300"
-          >
-            <p class="text-xs text-blue-600 font-medium">Total Geral</p>
-            <p class="text-lg font-bold text-blue-700">
-              {{ formatNumber(resumoMês.totalGeral) }} kg
-            </p>
-          </div>
-        </div>
-
-        <!-- Cards de Médias -->
-        <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <!-- Média Diária -->
-          <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-            <p class="text-xs font-medium text-gray-600 mb-2">Média Diária</p>
-            <div class="space-y-1">
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RSS:</span>
-                <span class="font-bold text-emerald-600"
-                  >{{ formatNumber(mediasProducao.diaria.rss) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">GB:</span>
-                <span class="font-bold text-amber-600"
-                  >{{ formatNumber(mediasProducao.diaria.gb) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RI:</span>
-                <span class="font-bold text-purple-600"
-                  >{{ formatNumber(mediasProducao.diaria.ri) }} kg</span
-                >
-              </div>
-              <div class="border-t pt-1 mt-1 flex justify-between text-xs">
-                <span class="text-gray-700 font-medium">Total:</span>
-                <span class="font-bold text-blue-600"
-                  >{{ formatNumber(mediasProducao.diaria.total) }} kg</span
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- Média Mensal -->
-          <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-            <p class="text-xs font-medium text-gray-600 mb-2">Média Mensal</p>
-            <div class="space-y-1">
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RSS:</span>
-                <span class="font-bold text-emerald-600"
-                  >{{ formatNumber(mediasProducao.mensal.rss) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">GB:</span>
-                <span class="font-bold text-amber-600"
-                  >{{ formatNumber(mediasProducao.mensal.gb) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RI:</span>
-                <span class="font-bold text-purple-600"
-                  >{{ formatNumber(mediasProducao.mensal.ri) }} kg</span
-                >
-              </div>
-              <div class="border-t pt-1 mt-1 flex justify-between text-xs">
-                <span class="text-gray-700 font-medium">Total:</span>
-                <span class="font-bold text-blue-600"
-                  >{{ formatNumber(mediasProducao.mensal.total) }} kg</span
-                >
-              </div>
-            </div>
-          </div>
-
-          <!-- Média Semana Atual -->
-          <div class="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-            <p class="text-xs font-medium text-gray-600 mb-2">
-              Média Semana Atual
-            </p>
-            <div class="space-y-1">
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RSS:</span>
-                <span class="font-bold text-emerald-600"
-                  >{{ formatNumber(mediasProducao.semanaAtual.rss) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">GB:</span>
-                <span class="font-bold text-amber-600"
-                  >{{ formatNumber(mediasProducao.semanaAtual.gb) }} kg</span
-                >
-              </div>
-              <div class="flex justify-between text-xs">
-                <span class="text-gray-500">RI:</span>
-                <span class="font-bold text-purple-600"
-                  >{{ formatNumber(mediasProducao.semanaAtual.ri) }} kg</span
-                >
-              </div>
-              <div class="border-t pt-1 mt-1 flex justify-between text-xs">
-                <span class="text-gray-700 font-medium">Total:</span>
-                <span class="font-bold text-blue-600"
-                  >{{ formatNumber(mediasProducao.semanaAtual.total) }} kg</span
-                >
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div class="container mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
@@ -154,6 +9,41 @@
         <p class="text-text-secondary">
           Visualização dos dados de produção registrados
         </p>
+      </div>
+
+      <!-- Resumo do Mês Atual -->
+      <div
+        class="mb-8 bg-gradient-to-r from-primary-50 to-primary-100 rounded-lg p-6 border border-primary-200"
+      >
+        <h3 class="text-lg font-semibold text-primary-800 mb-4">
+          📊 Resumo de {{ mesesDisponiveis[mesAtualIndex]?.label }}
+        </h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <p class="text-sm text-gray-500">Total RSS</p>
+            <p class="text-xl font-bold text-primary-600">
+              {{ resumoMesAtual.totalRSS.toFixed(2) }} kg
+            </p>
+          </div>
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <p class="text-sm text-gray-500">Total GB</p>
+            <p class="text-xl font-bold text-primary-600">
+              {{ resumoMesAtual.totalGB.toFixed(2) }} kg
+            </p>
+          </div>
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <p class="text-sm text-gray-500">Total RI</p>
+            <p class="text-xl font-bold text-primary-600">
+              {{ resumoMesAtual.totalRI.toFixed(2) }} kg
+            </p>
+          </div>
+          <div class="bg-white rounded-lg p-4 shadow-sm">
+            <p class="text-sm text-gray-500">Total Geral</p>
+            <p class="text-xl font-bold text-primary-600">
+              {{ resumoMesAtual.totalGeral.toFixed(2) }} kg
+            </p>
+          </div>
+        </div>
       </div>
 
       <!-- Loading state -->
@@ -717,152 +607,6 @@ const resumoMesAtual = computed(() => {
     ),
   };
 });
-
-// Label do mês atual
-const mêsAtualLabel = computed(() => {
-  if (mesesDisponiveis.value.length === 0) return "Sem dados";
-  return mesesDisponiveis.value[mesAtualIndex.value]?.label || "Sem dados";
-});
-
-// Resumo com nomes customizados para o template
-const resumoMês = computed(() => {
-  return {
-    totalRss: resumoMesAtual.value.totalRSS,
-    totalGb: resumoMesAtual.value.totalGB,
-    totalRi: resumoMesAtual.value.totalRI,
-    totalGeral: resumoMesAtual.value.totalGeral,
-  };
-});
-
-// Calcular as médias de produção
-const mediasProducao = computed(() => {
-  const items = dadosDoMesAtual.value;
-
-  if (items.length === 0) {
-    return {
-      diaria: { rss: 0, gb: 0, ri: 0, total: 0 },
-      mensal: { rss: 0, gb: 0, ri: 0, total: 0 },
-      semanaAtual: { rss: 0, gb: 0, ri: 0, total: 0 },
-    };
-  }
-
-  // Média Diária
-  const totalRss = items.reduce(
-    (acc, item) => acc + (parseFloat(item.RSS) || 0),
-    0
-  );
-  const totalGb = items.reduce(
-    (acc, item) => acc + (parseFloat(item.GB) || 0),
-    0
-  );
-  const totalRi = items.reduce(
-    (acc, item) => acc + (parseFloat(item.RI) || 0),
-    0
-  );
-  const totalGeral = items.reduce(
-    (acc, item) => acc + (parseFloat(item.Total) || 0),
-    0
-  );
-
-  const mediaDiaria = {
-    rss: totalRss / items.length,
-    gb: totalGb / items.length,
-    ri: totalRi / items.length,
-    total: totalGeral / items.length,
-  };
-
-  // Média Mensal (considera todos os dias do mês)
-  const agora = new Date();
-  const mesAnoAtual = `${agora.getFullYear()}-${String(
-    agora.getMonth()
-  ).padStart(2, "0")}`;
-  const mesAnoExibicao =
-    mesesDisponiveis.value[mesAtualIndex.value]?.label || "";
-
-  // Extrair ano e mês da label
-  let diasNoMes = 30;
-  try {
-    const partes = mesAnoExibicao.split(" ");
-    const ano = parseInt(partes[1]);
-    const mesNome = partes[0];
-    const mesIndex = nomesMeses.indexOf(mesNome);
-
-    if (mesIndex >= 0) {
-      // Calcular quantidade de dias no mês
-      const proximoMes = new Date(ano, mesIndex + 1, 0);
-      diasNoMes = proximoMes.getDate();
-    }
-  } catch (e) {
-    diasNoMes = 30;
-  }
-
-  const mediaMensal = {
-    rss: totalRss / diasNoMes,
-    gb: totalGb / diasNoMes,
-    ri: totalRi / diasNoMes,
-    total: totalGeral / diasNoMes,
-  };
-
-  // Média Semana Atual
-  const hoje = new Date();
-  const diaAtual = hoje.getDay();
-  const diaSemana = diaAtual === 0 ? 6 : diaAtual - 1; // Segunda = 0, Domingo = 6
-
-  // Calcular primeira segunda da semana
-  const primeiraDaSemanana = new Date(hoje);
-  primeiraDaSemanana.setDate(hoje.getDate() - diaSemana);
-  primeiraDaSemanana.setHours(0, 0, 0, 0);
-
-  // Calcular última domingo da semana
-  const ultimaDaSemana = new Date(primeiraDaSemanana);
-  ultimaDaSemana.setDate(primeiraDaSemanana.getDate() + 6);
-  ultimaDaSemana.setHours(23, 59, 59, 999);
-
-  // Filtrar registros da semana atual
-  const itemsDaSemana = items.filter((item) => {
-    const dataItem = new Date(item.DataFoto);
-    return dataItem >= primeiraDaSemanana && dataItem <= ultimaDaSemana;
-  });
-
-  let mediaSemana = { rss: 0, gb: 0, ri: 0, total: 0 };
-  if (itemsDaSemana.length > 0) {
-    const rssS = itemsDaSemana.reduce(
-      (acc, item) => acc + (parseFloat(item.RSS) || 0),
-      0
-    );
-    const gbS = itemsDaSemana.reduce(
-      (acc, item) => acc + (parseFloat(item.GB) || 0),
-      0
-    );
-    const riS = itemsDaSemana.reduce(
-      (acc, item) => acc + (parseFloat(item.RI) || 0),
-      0
-    );
-    const geralS = itemsDaSemana.reduce(
-      (acc, item) => acc + (parseFloat(item.Total) || 0),
-      0
-    );
-
-    mediaSemana = {
-      rss: rssS / itemsDaSemana.length,
-      gb: gbS / itemsDaSemana.length,
-      ri: riS / itemsDaSemana.length,
-      total: geralS / itemsDaSemana.length,
-    };
-  }
-
-  return {
-    diaria: mediaDiaria,
-    mensal: mediaMensal,
-    semanaAtual: mediaSemana,
-  };
-});
-
-// Função para formatar números
-function formatNumber(value) {
-  if (!value || isNaN(value)) return "0.00";
-  return parseFloat(value).toFixed(2);
-}
 
 // Funções de navegação do carrossel
 function mesAnterior() {
