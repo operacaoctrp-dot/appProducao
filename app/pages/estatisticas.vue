@@ -374,81 +374,6 @@
           </div>
         </div>
 
-        <!-- Gráficos -->
-        <div class="grid lg:grid-cols-2 gap-6 mb-6">
-          <!-- Gráfico de Linha - Evolução Diária -->
-          <div
-            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
-          >
-            <h3
-              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
-            >
-              <span class="text-2xl">📈</span> Evolução Diária
-            </h3>
-            <div class="h-72">
-              <Line
-                v-if="chartData.labels.length > 0"
-                :data="lineChartData"
-                :options="lineChartOptions"
-              />
-              <div
-                v-else
-                class="h-full flex items-center justify-center text-gray-400"
-              >
-                Sem dados para exibir
-              </div>
-            </div>
-          </div>
-
-          <!-- Gráfico de Barras - Por Tipo -->
-          <div
-            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
-          >
-            <h3
-              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
-            >
-              <span class="text-2xl">📊</span> Distribuição por Tipo
-            </h3>
-            <div class="h-72">
-              <Doughnut
-                v-if="stats.totalGeral > 0"
-                :data="doughnutChartData"
-                :options="doughnutChartOptions"
-              />
-              <div
-                v-else
-                class="h-full flex items-center justify-center text-gray-400"
-              >
-                Sem dados para exibir
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gráfico de Barras Comparativo -->
-        <div
-          class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6"
-        >
-          <h3
-            class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
-          >
-            <span class="text-2xl">📉</span> Comparativo por Período
-          </h3>
-          <div class="h-80">
-            <Bar
-              v-if="chartData.labels.length > 0"
-              :data="barChartData"
-              :options="barChartOptions"
-            />
-            <div
-              v-else
-              class="h-full flex items-center justify-center text-gray-400"
-            >
-              Sem dados para exibir
-            </div>
-          </div>
-        </div>
-
         <!-- Top 5 Dias de Maior Recebimento -->
         <div
           class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6"
@@ -586,34 +511,7 @@
 </template>
 
 <script setup>
-import { Line, Bar, Doughnut } from "vue-chartjs";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from "chart.js";
-
-// Registrar componentes do Chart.js
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
+import { ref, computed, watch, onMounted } from "vue";
 
 // Definir layout e middleware
 definePageMeta({

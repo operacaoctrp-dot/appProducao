@@ -195,7 +195,7 @@ const handleSignOut = async () => {
   try {
     await signOut();
   } catch (error) {
-    console.error('Erro ao fazer logout:', error);
+    console.error("Erro ao fazer logout:", error);
   }
 };
 
