@@ -46,6 +46,42 @@
         </div>
       </div>
 
+      <!-- Médias por Semana -->
+      <div v-if="mediasProducao.semanas.length > 0" class="mb-8">
+        <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+          <span>📅</span> Médias por Semana
+        </h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            v-for="(semana, index) in mediasProducao.semanas"
+            :key="index"
+            class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
+          >
+            <p class="text-sm font-semibold text-gray-800 mb-3">
+              Semana {{ semana.numero }} ({{ semana.dataInicio }} - {{ semana.dataFim }})
+            </p>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between">
+                <span class="text-gray-600">RSS:</span>
+                <span class="font-bold text-emerald-600">{{ formatNumber(semana.rss) }} kg</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">GB:</span>
+                <span class="font-bold text-amber-600">{{ formatNumber(semana.gb) }} kg</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-600">RI:</span>
+                <span class="font-bold text-purple-600">{{ formatNumber(semana.ri) }} kg</span>
+              </div>
+              <div class="border-t pt-2 flex justify-between">
+                <span class="font-medium text-gray-700">Total:</span>
+                <span class="font-bold text-blue-600">{{ formatNumber(semana.total) }} kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Loading state -->
       <div v-if="loading" class="text-center py-12">
         <div
@@ -605,6 +641,93 @@ const resumoMesAtual = computed(() => {
       (acc, item) => acc + (parseFloat(item.Total) || 0),
       0
     ),
+  };
+});
+
+// Calcular as médias de produção por semana
+const mediasProducao = computed(() => {
+  const items = dadosDoMesAtual.value;
+
+  if (items.length === 0) {
+    return {
+      semanas: [],
+    };
+  }
+
+  // Médias por Semana Específica
+  const semanaMap = new Map();
+
+  items.forEach((item) => {
+    const date = new Date(item.DataFoto);
+
+    // Calcular o primeiro dia da semana (segunda-feira)
+    const dia = date.getDate();
+    const mes = date.getMonth();
+    const ano = date.getFullYear();
+
+    // Descobrir o dia da semana (0 = domingo, 1 = segunda, etc.)
+    const diaSemana = date.getDay();
+
+    // Calcular quantos dias voltar para chegar à segunda-feira
+    const diasParaVoltarParaSegunda = diaSemana === 0 ? 6 : diaSemana - 1;
+
+    // Data da segunda-feira (início da semana)
+    const dataSegunda = new Date(ano, mes, dia - diasParaVoltarParaSegunda);
+    const numSemana = Math.ceil(
+      (date.getDate() + new Date(ano, mes, 1).getDay() - 1) / 7
+    );
+
+    const chaveSegunda = `${dataSegunda.getFullYear()}-${String(
+      dataSegunda.getMonth() + 1
+    ).padStart(2, "0")}-${String(dataSegunda.getDate()).padStart(2, "0")}`;
+
+    if (!semanaMap.has(chaveSegunda)) {
+      semanaMap.set(chaveSegunda, {
+        dataSegunda: dataSegunda,
+        numeroSemana: numSemana,
+        count: 0,
+        rss: 0,
+        gb: 0,
+        ri: 0,
+        total: 0,
+      });
+    }
+
+    const semana = semanaMap.get(chaveSegunda);
+    semana.count++;
+    semana.rss += Number(item.RSS || 0);
+    semana.gb += Number(item.GB || 0);
+    semana.ri += Number(item.RI || 0);
+    semana.total += Number(item.Total || 0);
+  });
+
+  // Converter para array e formatar
+  const semanas = Array.from(semanaMap.values())
+    .sort((a, b) => a.dataSegunda - b.dataSegunda)
+    .map((semana, index) => {
+      const dataSegunda = semana.dataSegunda;
+      const dataDomingo = new Date(dataSegunda);
+      dataDomingo.setDate(dataDomingo.getDate() + 6);
+
+      const formatarData = (date) => {
+        return `${String(date.getDate()).padStart(2, "0")}/${String(
+          date.getMonth() + 1
+        ).padStart(2, "0")}`;
+      };
+
+      return {
+        numero: index + 1,
+        dataInicio: formatarData(dataSegunda),
+        dataFim: formatarData(dataDomingo),
+        rss: semana.rss / semana.count,
+        gb: semana.gb / semana.count,
+        ri: semana.ri / semana.count,
+        total: semana.total / semana.count,
+      };
+    });
+
+  return {
+    semanas: semanas,
   };
 });
 
