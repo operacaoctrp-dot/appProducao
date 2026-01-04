@@ -14,10 +14,15 @@
       <!-- Títulos das Seções -->
       <div class="mb-8">
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
-          <h3 class="text-lg font-semibold text-text-primary flex items-center gap-2">
+          <h3
+            class="text-lg font-semibold text-text-primary flex items-center gap-2"
+          >
             <span>📊</span> {{ mesesDisponiveis[mesAtualIndex]?.label }}
           </h3>
-          <h3 v-if="mediasProducao.semanas.length > 0" class="lg:col-span-3 text-lg font-semibold text-text-primary flex items-center gap-2">
+          <h3
+            v-if="mediasProducao.semanas.length > 0"
+            class="lg:col-span-3 text-lg font-semibold text-text-primary flex items-center gap-2"
+          >
             <span>📅</span> Médias por Semana
           </h3>
         </div>
@@ -207,7 +212,7 @@
 
         <!-- Cards do Mês Atual -->
         <div
-          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300"
+          class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 transition-all duration-300"
         >
           <div
             v-for="item in dadosDoMesAtual"
