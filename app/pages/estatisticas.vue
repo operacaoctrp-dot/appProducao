@@ -239,77 +239,136 @@
         <!-- Seção de Médias de Produção -->
         <div class="grid lg:grid-cols-3 gap-6 mb-6">
           <!-- Média Diária -->
-          <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div
+            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
               <span class="text-2xl">📅</span> Média Diária
             </h3>
             <div class="space-y-4">
-              <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-emerald-600 font-medium">RSS</p>
-                <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(mediasProducao.diaria.rss) }} kg</p>
+                <p class="text-2xl font-bold text-emerald-700">
+                  {{ formatNumber(mediasProducao.diaria.rss) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-amber-600 font-medium">GB</p>
-                <p class="text-2xl font-bold text-amber-700">{{ formatNumber(mediasProducao.diaria.gb) }} kg</p>
+                <p class="text-2xl font-bold text-amber-700">
+                  {{ formatNumber(mediasProducao.diaria.gb) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-purple-600 font-medium">RI</p>
-                <p class="text-2xl font-bold text-purple-700">{{ formatNumber(mediasProducao.diaria.ri) }} kg</p>
+                <p class="text-2xl font-bold text-purple-700">
+                  {{ formatNumber(mediasProducao.diaria.ri) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300">
+              <div
+                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300"
+              >
                 <p class="text-sm text-blue-600 font-medium">TOTAL</p>
-                <p class="text-2xl font-bold text-blue-700">{{ formatNumber(mediasProducao.diaria.total) }} kg</p>
+                <p class="text-2xl font-bold text-blue-700">
+                  {{ formatNumber(mediasProducao.diaria.total) }} kg
+                </p>
               </div>
             </div>
           </div>
 
           <!-- Média Mensal -->
-          <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <div
+            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
               <span class="text-2xl">📆</span> Média Mensal
             </h3>
             <div class="space-y-4">
-              <div class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-emerald-600 font-medium">RSS</p>
-                <p class="text-2xl font-bold text-emerald-700">{{ formatNumber(mediasProducao.mensal.rss) }} kg</p>
+                <p class="text-2xl font-bold text-emerald-700">
+                  {{ formatNumber(mediasProducao.mensal.rss) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-amber-600 font-medium">GB</p>
-                <p class="text-2xl font-bold text-amber-700">{{ formatNumber(mediasProducao.mensal.gb) }} kg</p>
+                <p class="text-2xl font-bold text-amber-700">
+                  {{ formatNumber(mediasProducao.mensal.gb) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4">
+              <div
+                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4"
+              >
                 <p class="text-sm text-purple-600 font-medium">RI</p>
-                <p class="text-2xl font-bold text-purple-700">{{ formatNumber(mediasProducao.mensal.ri) }} kg</p>
+                <p class="text-2xl font-bold text-purple-700">
+                  {{ formatNumber(mediasProducao.mensal.ri) }} kg
+                </p>
               </div>
-              <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300">
+              <div
+                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300"
+              >
                 <p class="text-sm text-blue-600 font-medium">TOTAL</p>
-                <p class="text-2xl font-bold text-blue-700">{{ formatNumber(mediasProducao.mensal.total) }} kg</p>
+                <p class="text-2xl font-bold text-blue-700">
+                  {{ formatNumber(mediasProducao.mensal.total) }} kg
+                </p>
               </div>
             </div>
           </div>
 
           <!-- Média Semanal -->
-          <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-              <span class="text-2xl">📊</span> Média por Dia da Semana
+          <div
+            class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100"
+          >
+            <h3
+              class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2"
+            >
+              <span class="text-2xl">📊</span> Média Semanal
             </h3>
-            <div class="space-y-2 max-h-96 overflow-y-auto">
-              <div v-for="(dia, index) in mediasProducao.semanal" :key="index" class="bg-gray-50 rounded-lg p-3 border border-gray-100">
-                <p class="text-sm font-semibold text-gray-700 mb-2">{{ dia.nome }}</p>
-                <div class="grid grid-cols-3 gap-2">
-                  <div class="bg-emerald-100 rounded px-2 py-1">
-                    <p class="text-xs text-emerald-600 font-medium">RSS</p>
-                    <p class="text-sm font-bold text-emerald-700">{{ formatNumber(dia.rss) }}</p>
-                  </div>
-                  <div class="bg-amber-100 rounded px-2 py-1">
-                    <p class="text-xs text-amber-600 font-medium">GB</p>
-                    <p class="text-sm font-bold text-amber-700">{{ formatNumber(dia.gb) }}</p>
-                  </div>
-                  <div class="bg-purple-100 rounded px-2 py-1">
-                    <p class="text-xs text-purple-600 font-medium">RI</p>
-                    <p class="text-sm font-bold text-purple-700">{{ formatNumber(dia.ri) }}</p>
-                  </div>
-                </div>
+            <div class="space-y-4">
+              <div
+                class="bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl p-4"
+              >
+                <p class="text-sm text-emerald-600 font-medium">RSS</p>
+                <p class="text-2xl font-bold text-emerald-700">
+                  {{ formatNumber(mediasProducao.semanal.rss) }} kg
+                </p>
+              </div>
+              <div
+                class="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4"
+              >
+                <p class="text-sm text-amber-600 font-medium">GB</p>
+                <p class="text-2xl font-bold text-amber-700">
+                  {{ formatNumber(mediasProducao.semanal.gb) }} kg
+                </p>
+              </div>
+              <div
+                class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl p-4"
+              >
+                <p class="text-sm text-purple-600 font-medium">RI</p>
+                <p class="text-2xl font-bold text-purple-700">
+                  {{ formatNumber(mediasProducao.semanal.ri) }} kg
+                </p>
+              </div>
+              <div
+                class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 border-2 border-blue-300"
+              >
+                <p class="text-sm text-blue-600 font-medium">TOTAL</p>
+                <p class="text-2xl font-bold text-blue-700">
+                  {{ formatNumber(mediasProducao.semanal.total) }} kg
+                </p>
               </div>
             </div>
           </div>
@@ -922,12 +981,7 @@ const mediasProducao = computed(() => {
     return {
       diaria: { rss: 0, gb: 0, ri: 0, total: 0 },
       mensal: { rss: 0, gb: 0, ri: 0, total: 0 },
-      semanal: Array(7).fill(null).map((_, i) => ({
-        nome: ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'][i],
-        rss: 0,
-        gb: 0,
-        ri: 0
-      }))
+      semanal: { rss: 0, gb: 0, ri: 0, total: 0 },
     };
   }
 
@@ -935,18 +989,21 @@ const mediasProducao = computed(() => {
   const totalRss = data.reduce((sum, item) => sum + Number(item.RSS || 0), 0);
   const totalGb = data.reduce((sum, item) => sum + Number(item.GB || 0), 0);
   const totalRi = data.reduce((sum, item) => sum + Number(item.RI || 0), 0);
-  const totalGeral = data.reduce((sum, item) => sum + Number(item.Total || 0), 0);
+  const totalGeral = data.reduce(
+    (sum, item) => sum + Number(item.Total || 0),
+    0
+  );
 
   const mediaDiaria = {
     rss: totalRss / data.length,
     gb: totalGb / data.length,
     ri: totalRi / data.length,
-    total: totalGeral / data.length
+    total: totalGeral / data.length,
   };
 
   // Média Mensal - considerar quantos meses têm dados
   const meses = new Set();
-  data.forEach(item => {
+  data.forEach((item) => {
     const date = new Date(item.DataFoto);
     meses.add(`${date.getFullYear()}-${date.getMonth()}`);
   });
@@ -955,36 +1012,31 @@ const mediasProducao = computed(() => {
     rss: totalRss / meses.size,
     gb: totalGb / meses.size,
     ri: totalRi / meses.size,
-    total: totalGeral / meses.size
+    total: totalGeral / meses.size,
   };
 
-  // Média Semanal - agrupar por dia da semana (0 = domingo, 1 = segunda, etc.)
-  const diasSemana = Array(7).fill(null).map(() => ({ count: 0, rss: 0, gb: 0, ri: 0 }));
-  
-  data.forEach(item => {
+  // Média Semanal (segunda a domingo) - considerar quantas semanas têm dados
+  const semanas = new Set();
+  data.forEach((item) => {
     const date = new Date(item.DataFoto);
-    const diaSemanaNr = date.getDay(); // 0 = domingo, 1 = segunda, etc.
-    // Converter para índice 0 = segunda, 6 = domingo
-    const indice = diaSemanaNr === 0 ? 6 : diaSemanaNr - 1;
-    
-    diasSemana[indice].count++;
-    diasSemana[indice].rss += Number(item.RSS || 0);
-    diasSemana[indice].gb += Number(item.GB || 0);
-    diasSemana[indice].ri += Number(item.RI || 0);
+    const ano = date.getFullYear();
+    const semana = Math.ceil(
+      (date.getDate() - date.getDay() + (date.getDay() === 0 ? -6 : 1)) / 7
+    );
+    semanas.add(`${ano}-W${semana}`);
   });
 
-  const nomesDias = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
-  const mediaSemanal = diasSemana.map((dia, index) => ({
-    nome: nomesDias[index],
-    rss: dia.count > 0 ? dia.rss / dia.count : 0,
-    gb: dia.count > 0 ? dia.gb / dia.count : 0,
-    ri: dia.count > 0 ? dia.ri / dia.count : 0
-  }));
+  const mediaSemanal = {
+    rss: totalRss / semanas.size,
+    gb: totalGb / semanas.size,
+    ri: totalRi / semanas.size,
+    total: totalGeral / semanas.size,
+  };
 
   return {
     diaria: mediaDiaria,
     mensal: mediaMenusal,
-    semanal: mediaSemanal
+    semanal: mediaSemanal,
   };
 });
 
