@@ -48,7 +48,9 @@
 
       <!-- Médias por Semana -->
       <div v-if="mediasProducao.semanas.length > 0" class="mb-8">
-        <h3 class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2">
+        <h3
+          class="text-lg font-semibold text-text-primary mb-4 flex items-center gap-2"
+        >
           <span>📅</span> Médias por Semana
         </h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -58,24 +60,33 @@
             class="bg-white rounded-lg p-4 shadow-sm border border-gray-200"
           >
             <p class="text-sm font-semibold text-gray-800 mb-3">
-              Semana {{ semana.numero }} ({{ semana.dataInicio }} - {{ semana.dataFim }})
+              Semana {{ semana.numero }} ({{ semana.dataInicio }} -
+              {{ semana.dataFim }})
             </p>
             <div class="space-y-2 text-xs">
               <div class="flex justify-between">
                 <span class="text-gray-600">RSS:</span>
-                <span class="font-bold text-emerald-600">{{ formatNumber(semana.rss) }} kg</span>
+                <span class="font-bold text-emerald-600"
+                  >{{ formatNumber(semana.rss) }} kg</span
+                >
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">GB:</span>
-                <span class="font-bold text-amber-600">{{ formatNumber(semana.gb) }} kg</span>
+                <span class="font-bold text-amber-600"
+                  >{{ formatNumber(semana.gb) }} kg</span
+                >
               </div>
               <div class="flex justify-between">
                 <span class="text-gray-600">RI:</span>
-                <span class="font-bold text-purple-600">{{ formatNumber(semana.ri) }} kg</span>
+                <span class="font-bold text-purple-600"
+                  >{{ formatNumber(semana.ri) }} kg</span
+                >
               </div>
               <div class="border-t pt-2 flex justify-between">
                 <span class="font-medium text-gray-700">Total:</span>
-                <span class="font-bold text-blue-600">{{ formatNumber(semana.total) }} kg</span>
+                <span class="font-bold text-blue-600"
+                  >{{ formatNumber(semana.total) }} kg</span
+                >
               </div>
             </div>
           </div>
@@ -730,6 +741,12 @@ const mediasProducao = computed(() => {
     semanas: semanas,
   };
 });
+
+// Função para formatar números
+function formatNumber(value) {
+  if (!value || isNaN(value)) return "0.00";
+  return parseFloat(value).toFixed(2);
+}
 
 // Funções de navegação do carrossel
 function mesAnterior() {
